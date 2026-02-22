@@ -18,7 +18,7 @@ Marks DXF files using the full filename (without extension) as the marking text.
 - `max_char` (int): Maximum character height. Default: 20
 - `start_y` (float): Starting Y coordinate for search. Default: 1
 - `**kwargs`: Additional parameters accepted by `AddMark` (see `parameters.md`)
-  - Common: `scale_factor`, `space`, `mark_layer`, `excluded_layers`, `arbitrary_x`, `arbitrary_y`
+  - Common: `scale_factor`, `space`, `mark_layer`, `mark_color`, `excluded_layers`, `arbitrary_x`, `arbitrary_y`
 
 **Example:**
 ```python

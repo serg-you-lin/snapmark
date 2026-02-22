@@ -147,12 +147,12 @@ class Operation(ABC):
 # ========== CONCRETE IMPLEMENTATIONS (unchanged) ==========
 
 class AddMark(Operation):
-    """Aggiunge marcatura numerica ai file DXF."""
+    """Adding numeric marking to DXF files."""
     
     def __init__(self, sequence, scale_factor=50, space=1.5, min_char=5,
                  max_char=20, arbitrary_x=None, arbitrary_y=None, align='c',
                  start_y=1, step=2, margin=1, down_to=None, mark_layer='MARK', 
-                 excluded_layers=None):
+                 mark_color=None, excluded_layers=None):
         super().__init__()
         self.sequence = sequence
         self.scale_factor = scale_factor
@@ -166,7 +166,8 @@ class AddMark(Operation):
         self.step = step
         self.margin = margin
         self.down_to = down_to
-        self.layer = mark_layer
+        self.mark_layer = mark_layer
+        self.mark_color = mark_color
         self.excluded_layers = excluded_layers
         self.sequence_position = NS()
 
@@ -185,7 +186,7 @@ class AddMark(Operation):
             self.align, self.start_y, self.step, self.margin, self.down_to
         )
 
-        add_numbers_to_layer(doc, self.sequence_position, self.layer)
+        add_numbers_to_layer(doc, self.sequence_position, self.mark_layer, self.mark_color)
         return self.create_new
                      
     def message(self, file_name):
@@ -198,14 +199,15 @@ class AddMark(Operation):
 
 class SubstituteCircle(Operation):
     """Replaces existing circles with new circles of a different radius."""
-    
-    def __init__(self, find_circle_function, new_radius=None, new_diameter=None, layer='0'):
+
+    def __init__(self, find_circle_function, new_radius=None, new_diameter=None, circle_layer='0', circle_color=None):
         super().__init__()
         self.find_circle_function = find_circle_function
         self.new_radius = new_radius 
         self.new_diameter = new_diameter
-        self.layer = layer
-        
+        self.circle_layer = circle_layer
+        self.circle_color = circle_color
+
         if self.new_radius is None and self.new_diameter is None:
             raise ValueError('You must specify either new_radius or new_diameter.')
 
@@ -216,27 +218,28 @@ class SubstituteCircle(Operation):
             self.new_radius = self.new_diameter / 2
 
         center_holes = find_circle_centers(holes)
-        add_circle(doc, center_holes, radius=self.new_radius, layer=self.layer)
+        add_circle(doc, center_holes, radius=self.new_radius, circle_layer=self.circle_layer, circle_color=self.circle_color)
         delete_circle(doc, holes)
 
         return self.create_new
     
     def message(self, file_name):
         if self.new_diameter:
-            self.message_text = f"✓ Holes in {file_name}: nuovo diametro {self.new_diameter}"
+            self.message_text = f"✓ Holes in {file_name}: new diameter {self.new_diameter}"
         else:
-            self.message_text = f"✓ Holes in {file_name}: nuovo raggio {self.new_radius}"
+            self.message_text = f"✓ Holes in {file_name}: new radius {self.new_radius}"
         print(self.message_text)
 
 
 class AddX(Operation):
     """Adds an 'X' shape at the locations of circles."""
     
-    def __init__(self, find_circle_function, x_size=8, layer='MARK', delete_hole=True):
+    def __init__(self, find_circle_function, x_size=8, x_layer='MARK', x_color=None, delete_hole=True):
         super().__init__()
         self.find_circle_function = find_circle_function
         self.x_size = x_size
-        self.layer = layer
+        self.x_layer = x_layer
+        self.x_color = x_color
         self.delete_hole = delete_hole
 
     def execute(self, doc, folder, file_name):
@@ -246,7 +249,7 @@ class AddX(Operation):
         if self.delete_hole:
             delete_circle(doc, holes)
             
-        add_x(doc, center_holes, x_size=self.x_size, layer=self.layer)
+        add_x(doc, center_holes, x_size=self.x_size, x_layer=self.x_layer, x_color=self.x_color)
         return self.create_new
     
     def message(self, file_name):

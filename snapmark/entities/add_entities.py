@@ -1,12 +1,16 @@
 
 
-def add_circle(doc, hole_list, radius, layer='0'):
+def add_circle(doc, hole_list, radius, circle_layer='0', circle_color=None):
     """Adds circles at specified positions in the document."""
     msp = doc.modelspace()  # Access the model space of the drawing
     for center_x, center_y in hole_list:
         center = (center_x, center_y)
-        # print(center_x, center_y)
-        msp.add_circle(center=center, radius=radius, dxfattribs={'layer': layer}) 
+    
+        dxfattribs = {'layer': circle_layer}
+        if circle_color is not None:
+            dxfattribs['color'] = circle_color
+
+        msp.add_circle(center=center, radius=radius, dxfattribs=dxfattribs)
 
 
 def add_circle_with_handle(doc, center_x, center_y, radius=10, layer='0', handle=68):
@@ -21,7 +25,7 @@ def add_circle_with_handle(doc, center_x, center_y, radius=10, layer='0', handle
     return circle
 
 
-def add_x(doc, hole_list, x_size=8, layer='0'):
+def add_x(doc, hole_list, x_size=8, x_layer='0', x_color=None):
     """Adds an 'X' shape at specified positions in the document."""
     msp = doc.modelspace()
     for center_x, center_y in hole_list:
@@ -31,13 +35,16 @@ def add_x(doc, hole_list, x_size=8, layer='0'):
         x2 = center_x + (x_size / 1.4141) /2
         y2 = center_y + (x_size / 1.4141) /2
         
+        dxfattribs = {'layer': x_layer}
+        if x_color is not None:
+            dxfattribs['color'] = x_color
         # Add diagonal lines to form an 'x'
-        msp.add_line(start=(x1, y1), end=(x2, y2), dxfattribs={'layer': layer})
-        msp.add_line(start=(x1, y2), end=(x2, y1), dxfattribs={'layer': layer})
+        msp.add_line(start=(x1, y1), end=(x2, y2), dxfattribs=dxfattribs)
+        msp.add_line(start=(x1, y2), end=(x2, y1), dxfattribs=dxfattribs)
 
 
 
-def add_numbers_to_layer(doc, sequence, layer = '0'):
+def add_numbers_to_layer(doc, sequence, number_layer = '0', number_color=None):
     """Adds a sequence of lines to a specified layer in the document."""
     msp = doc.modelspace()
    
@@ -55,7 +62,11 @@ def add_numbers_to_layer(doc, sequence, layer = '0'):
                 scaled_segments[i + 1][1] + scaled_position[1]
             )
 
-            msp.add_line(start=start_point, end=end_point, dxfattribs={'layer': layer})
+            dxfattribs = {'layer': number_layer}
+            if number_color is not None:
+                dxfattribs['color'] = number_color
+
+            msp.add_line(start=start_point, end=end_point, dxfattribs=dxfattribs)
     
        
     

@@ -18,6 +18,7 @@ Adds numerical markings to DXF files.
 | `margin` | `float` | Margin around the sequence. | 1 |
 | `down_to` | `float` or `None` | Additional lower limit for the minimum allowed character dimension, only used when the sequence fails to be placed using the standard min_char constraint. | None |
 | `mark_layer` | `str` | Layer where markings are added. | 'MARK' |
+| `mark_color` | `str` | DXF color index of marking (ACI). | None |
 | `excluded_layers` | `list[str]` or `None` | Layers to not consider to compute marking position. | None |
 
 ---
@@ -31,6 +32,7 @@ Replaces circles with new radius or diameter.
 | `new_radius` | `float` or `None` | New radius for replacement circles. | None |
 | `new_diameter` | `float` or `None` | New diameter for replacement circles. | None |
 | `layer` | `str` | Layer to place new circles. | '0' |
+| `layer` | `str` | DXF color index of new circles (ACI). | 'None' |
 
 > Either `new_radius` or `new_diameter` **must** be provided.
 
@@ -44,6 +46,7 @@ Adds an "X" at circle locations.
 | `find_circle_function` | `Callable` | Function to find circles. | **Required** |
 | `x_size` | `float` | Size of the X to add. | 8 |
 | `layer` | `str` | Layer where the X is added. | 'MARK' |
+| `x_color` | `int` | DXF color index of the X (ACI).    | 'None'    |
 | `delete_hole` | `bool` | Whether to delete the original circle. | True |
 
 ---

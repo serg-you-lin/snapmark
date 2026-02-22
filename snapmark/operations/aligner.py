@@ -103,7 +103,7 @@ class Aligner(Operation):
 ################################################################################################    
 
 
-def add_rotated_entities_to_msp(msp, lines, arcs, circles, ellipses, pivot, angolo):
+def add_rotated_entities_to_msp(msp, lines, arcs, circles, ellipses, pivot, angle):
     """
     Rotates entities (lines, arcs, circles, ellipses) around a pivot point by a specified angle.
 
@@ -114,7 +114,7 @@ def add_rotated_entities_to_msp(msp, lines, arcs, circles, ellipses, pivot, ango
         circles (list): A list of circle entities to be rotated.
         ellipses (list): A list of ellipse entities to be rotated.
         pivot (tuple): The pivot point (x, y) around which the entities will be rotated.
-        angolo (float): The angle in radians by which to rotate the entities.
+        angle (float): The angle in radians by which to rotate the entities.
 
     Overview:
         This function rotates each type of entity around the specified pivot point and adds the rotated entities
@@ -122,22 +122,22 @@ def add_rotated_entities_to_msp(msp, lines, arcs, circles, ellipses, pivot, ango
     """
 
     for l in lines:
-        rotated_line = rotate_line_by_pivot_point(l, pivot, -1*angolo)    
+        rotated_line = rotate_line_by_pivot_point(l, pivot, -1*angle)    
         msp.add_entity(rotated_line)    
         msp.delete_entity(l)
    
     for c in circles:
-        rotated_circle = rotate_circle_by_pp(c, pivot, -1*angolo)
+        rotated_circle = rotate_circle_by_pp(c, pivot, -1*angle)
         msp.add_entity(rotated_circle)
         msp.delete_entity(c)
 
     for a in arcs:
-        rotated_arc = rotate_arc_by_pp(a, pivot, -1*angolo)
+        rotated_arc = rotate_arc_by_pp(a, pivot, -1*angle)
         msp.add_entity(rotated_arc)
         msp.delete_entity(a)
 
     for e in ellipses:
-        rotated_ellipse = rotate_ellipse_by_pp(e, pivot, -1*angolo)
+        rotated_ellipse = rotate_ellipse_by_pp(e, pivot, -1*angle)
         msp.add_entity(rotated_ellipse)
         msp.delete_entity(e)
 

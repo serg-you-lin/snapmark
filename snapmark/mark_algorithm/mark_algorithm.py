@@ -21,15 +21,20 @@ MIN_ARC_SEGS = 15
 # Support functions to pass in the main (deprecated)
 
 def comp_sf(doc, scale_factor=50):
-    """Calculates the scale factor based on the dimensions of the drawing."""
     extmax = doc.header.get('$EXTMAX')
     extmin = doc.header.get('$EXTMIN')
-    drawing_width = extmax[0] - extmin[0]
-    drawing_height = extmax[1] - extmin[1]
+
+    # Header mancante o valori sentinella (file vecchi)
+    if extmin is None or extmax is None or abs(extmax[0]) > 1e15:
+        msp = doc.modelspace()
+        _, min_x, min_y, max_x, max_y, _ = comp_segs_and_limits(msp)
+        drawing_width = max_x - min_x
+        drawing_height = max_y - min_y
+    else:
+        drawing_width = abs(extmax[0] - extmin[0])
+        drawing_height = abs(extmax[1] - extmin[1])
 
     return min(drawing_width, drawing_height) / scale_factor
-
-
 ######################################################################################################################
 
 ######################################################################################################################
@@ -146,6 +151,36 @@ def comp_segs_and_limits(msp, excluded_layers=None):
             if z1_val != 0 or z2_val != 0:
                 is_2d = False       
 
+
+    for entity in msp.query('POLYLINE'):
+        if skip(entity):
+            continue
+        
+        # Solo 2D polyline
+        if entity.get_mode() != 'AcDb2dPolyline':
+            continue
+        
+        verts = entity.vertices 
+        if len(verts) < 2:
+            continue
+
+        for i in range(len(verts) - 1):
+            x1 = verts[i].dxf.location.x
+            y1 = verts[i].dxf.location.y
+            z1 = verts[i].dxf.location.z
+            x2 = verts[i+1].dxf.location.x
+            y2 = verts[i+1].dxf.location.y
+            z2 = verts[i+1].dxf.location.z
+            line_segs.append((x1, y1, x2, y2))
+            if z1 != 0 or z2 != 0:
+                is_2d = False
+
+        if entity.is_closed:
+            x1 = verts[-1].dxf.location.x
+            y1 = verts[-1].dxf.location.y
+            x2 = verts[0].dxf.location.x
+            y2 = verts[0].dxf.location.y
+            line_segs.append((x1, y1, x2, y2))
 
     for entity in msp.query('CIRCLE ARC'):
         if skip(entity):
@@ -518,15 +553,6 @@ def place_sequence(doc, text, scale_factor, excluded_layers, space=1.5, min_char
     if not is_2d:
         file_name = doc.filename if hasattr(doc, 'filename') else 'unknown file'
         raise ValueError(dxf_3d_geometry_error(file_name))
-        # raise ValueError(
-        #     "❌ 3D GEOMETRY DETECTED!\n\n"
-        #     "SnapMark only supports 2D drawings for laser marking.\n"
-        #     "Please flatten your DXF to 2D before processing.\n\n"
-        #     "How to fix:\n"
-        #     "  • In AutoCAD/DraftSight: Use FLATTEN command\n"
-        #     "  • In FreeCAD: Export as 2D DXF\n"
-        #     "  • Ensure all Z coordinates are zero"
-        # )
 
     sequence = NS()
        

@@ -18,7 +18,7 @@ def main():
     folder_2 = "input_customizable"
     
     print("=== Example 1A: Mark with filename ===")
-    sm.mark_by_name(folder_1, scale_factor=100, min_char=10, max_char=30, start_y=1, margin=.5, step=2, space = 2, down_to=1)
+    sm.mark_by_name(folder_1, scale_factor=50, min_char=10, max_char=20, start_y=2, margin=.5, step=2, space = 1.5, down_to=3, mark_color=4)
     
     print("\n=== Example 1B: Mark with first part of filename ===")
     # For files like "PART_123_Q5.dxf", this marks only "PART"

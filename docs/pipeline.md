@@ -94,7 +94,7 @@ Adds text marking to the drawing.
 
 ```python
 seq = sm.SequenceBuilder().file_name().build()
-sm.AddMark(seq, scale_factor=120, align='l', mark_layer='ENGRAVE')
+sm.AddMark(seq, scale_factor=120, align='l', mark_layer='ENGRAVE', mark_color=5)
 ```
 
 ---
@@ -130,7 +130,7 @@ Replaces circles with "X" marks (for manual drilling).
 
 ```python
 # Mark small holes for manual drilling
-sm.AddX(sm.find_circle_by_radius(3, 6), x_size=5, layer='MANUAL')
+sm.AddX(sm.find_circle_by_radius(3, 6), x_size=5, x_layer='MANUAL', x_color=1)
 ```
 
 ---
@@ -216,7 +216,7 @@ manager.add_operation(
     sm.Aligner(),                                    # Normalize orientation
     sm.CountHoles(sm.find_circle_by_radius(5, 10)), # Verify holes
     sm.AddMark(seq, scale_factor=120),               # Add product code
-    sm.AddX(sm.find_circle_by_radius(3, 5), x_size=6) # Mark small holes
+    sm.AddX(sm.find_circle_by_radius(3, 5), x_size=6, x_color=3) # Mark small holes with cyan 'X' symbols
 )
 manager.execute(recursive=True)
 ```

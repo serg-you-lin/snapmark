@@ -48,7 +48,7 @@ def main():
         "input/F7.dxf",
         sm.Aligner(),
         sm.AddMark(seq, start_y=.5),
-        sm.AddX(sm.find_circle_by_radius(5, 10), x_size=5),
+        sm.AddX(sm.find_circle_by_radius(5, 10), x_size=5, x_color=1, x_layer="Engrave"),
         use_backup=True
     )
     
