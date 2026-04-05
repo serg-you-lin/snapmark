@@ -15,12 +15,11 @@ import snapmark as sm
 
 def main():
     folder = str(ROOT / "examples" / "input")
-    folder = r"c:\Users\FEDERICO\Documents\Python_Scripts\Projects\DXF\33-24\Giunti"
     
     # Build custom sequence
     seq = (sm.SequenceBuilder()
            .file_name(trim_start=5)
-           #.folder(num_chars=2)
+           .folder(num_chars=2)
            .build())
     
     print("=== Pipeline: Align + Mark + Count ===")
