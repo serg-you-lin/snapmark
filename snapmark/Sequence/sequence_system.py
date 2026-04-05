@@ -4,6 +4,7 @@ Sequence system for SnapMark - Hybrid version.
 Maintains Conc for compatibility, introduces SequenceBuilder as the main API.
 """
 
+from email.mime import base
 import os
 from typing import List, Callable
 from abc import ABC, abstractmethod
@@ -52,10 +53,30 @@ class LiteralComponent(SequenceComponent):
 class FileNameComponent(SequenceComponent):
     """Represents the file name without extension."""
 
-    def extract(self, folder: str, file_name: str) -> str:
-        """Returns the file name without its extension."""
-        return os.path.splitext(file_name)[0]
+    def __init__(self, trim_start: int = 0, trim_end: int = 0):
+        """
+        Initializes the FileNameComponent with optional trimming parameters.
 
+        Args:
+            trim_start (int): Number of characters to trim from the start of the file name.
+            trim_end (int): Number of characters to trim from the end of the file name.
+        """
+        self.trim_start = trim_start
+        self.trim_end = trim_end
+        
+    def extract(self, folder: str, file_name: str) -> str:
+        base = os.path.splitext(file_name)[0]
+
+        if self.trim_start < 0 or self.trim_end < 0:
+            raise ValueError("trim values must be >= 0")
+
+        if self.trim_start + self.trim_end >= len(base):
+            return base  
+        
+        start = self.trim_start
+        end = None if self.trim_end == 0 else -self.trim_end
+
+        return base[start:end]
 
 class FolderNameComponent(SequenceComponent):
     """Represents the folder name (optionally the first N characters)."""
@@ -172,9 +193,9 @@ class SequenceBuilder:
         self.components.append(LiteralComponent(text))
         return self
     
-    def file_name(self) -> 'SequenceBuilder':
-        """Adds the full file name (without extension) to the sequence."""
-        self.components.append(FileNameComponent())
+    def file_name(self, trim_start: int = 0, trim_end: int = 0) -> 'SequenceBuilder':
+        """Adds the file name (optionally trimming start/end characters)."""
+        self.components.append(FileNameComponent(trim_start, trim_end))
         return self
     
     

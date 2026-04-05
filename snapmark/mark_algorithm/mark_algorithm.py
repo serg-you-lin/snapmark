@@ -3,6 +3,12 @@ import numpy as np
 from snapmark.utils.segments_dict import number_segments_dict
 from snapmark.utils.helpers import is_excluded_layer
 from snapmark.utils.messages import dxf_3d_geometry_error
+from snapmark.utils.geometry import (
+    find_reference_entity,
+    ref_angle_and_pivot,
+    rotate_segs,
+    rotate_ns_sequence,
+)
 
 
 # Classe per definire la sequenza di numeri
@@ -500,6 +506,108 @@ def sequence_dim(sequence, x_pos, y_pos, space):
 ##################################################################################################################
 # Level 0 -- Function to place sequence on valid point of model space
 ###################################################################################################################
+
+# def place_sequence(doc, text, scale_factor, excluded_layers, space=1.5, min_char=5,
+#                    max_char=20, arbitrary_x=None, arbitrary_y=None,
+#                    align='c', start_y=1, step=2, margin=1, down_to=None,
+#                    ref_entity=None):
+
+#     x_intercept_cache.clear()
+#     segments_cache = None
+
+#     if len(text) == 0:
+#         raise Exception('Empty sequence.')
+
+#     msp = doc.modelspace()
+#     segments_cache = comp_segs_and_limits(msp, excluded_layers)
+#     segs, min_x, min_y, max_x, max_y, is_2d = segments_cache
+
+#     if not is_2d:
+#         file_name = doc.filename if hasattr(doc, 'filename') else 'unknown file'
+#         raise ValueError(dxf_3d_geometry_error(file_name))
+
+#     # --- NUOVO: trova entità di riferimento e prepara rotazione ---
+#     ref_angle = 0.0
+#     ref_pivot = (min_x, min_y)
+
+#     if arbitrary_x is None or arbitrary_y is None:
+#         if ref_entity is None:
+#             lines = list(msp.query('LINE'))
+#             lwpolylines = list(msp.query('LWPOLYLINE'))
+#             ref_entity = find_reference_entity(lines, lwpolylines)
+
+#         if ref_entity is not None:
+#             ref_angle, ref_pivot = ref_angle_and_pivot(ref_entity)
+
+#         if ref_angle != 0.0:
+#             segs = rotate_segs(segs, ref_pivot, -ref_angle)
+#             # ricalcola i limiti sui segs ruotati
+#             all_x = [v for seg in segs for v in (seg[0], seg[2])]
+#             all_y = [v for seg in segs for v in (seg[1], seg[3])]
+#             min_x, max_x = min(all_x), max(all_x)
+#             min_y, max_y = min(all_y), max(all_y)
+#             # aggiorna la cache con i segs ruotati
+#             segments_cache = (segs, min_x, min_y, max_x, max_y, is_2d)
+
+#     # --- fine blocco nuovo ---
+
+#     sequence = NS()
+#     height_sequence = 0.0
+
+#     if arbitrary_x is None:
+#         x_pos = 0
+#     else:
+#         x_pos = arbitrary_x
+
+#     if arbitrary_y is None:
+#         y_pos = 0
+#     else:
+#         y_pos = arbitrary_y
+
+#     for i, char in enumerate(text):
+#         if char in number_segments_dict:
+#             segments = number_segments_dict[char]
+#             scaled_segments = [[x * scale_factor, y * scale_factor] for x, y in segments]
+#             sequence.add_number(scaled_segments, [x_pos, y_pos])
+#             number_height = max([x[1] for x in scaled_segments]) - min([x[1] for x in scaled_segments])
+#             height_sequence = max(number_height, height_sequence)
+
+#     if height_sequence < min_char:
+#         scale_factor = scale_factor / height_sequence * min_char
+#         sequence = rescale_sequence(text, scale_factor, x_pos, y_pos)
+#     elif height_sequence > max_char:
+#         scale_factor = scale_factor / height_sequence * max_char
+#         sequence = rescale_sequence(text, scale_factor, x_pos, y_pos)
+
+#     lenght_sequence, height_sequence = sequence_dim(sequence, x_pos, y_pos, space)
+
+#     if arbitrary_x is None or arbitrary_y is None:
+#         x, y = find_space_for_sequence(lenght_sequence, height_sequence, doc, align, start_y, step, margin, excluded_layers)
+#         if down_to is None:
+#             down_to = min_char
+#         while x is None or y is None:
+#             rescale_factor = 0.8
+#             new_height_sequence = height_sequence * rescale_factor
+#             if new_height_sequence < down_to:
+#                 break
+#             scale_factor = scale_factor * rescale_factor
+#             sequence = rescale_sequence(text, scale_factor, x_pos, y_pos)
+#             lenght_sequence, height_sequence = sequence_dim(sequence, x_pos, y_pos, space)
+#             x, y = find_space_for_sequence(lenght_sequence, height_sequence, doc, align, start_y, step, margin, excluded_layers)
+
+#         if x is None or y is None:
+#             sequence = NS()
+#         else:
+#             for scaled_segments, position in sequence.sequence:
+#                 position[0] += x
+#                 position[1] += y
+
+#             # --- NUOVO: riporta in coordinate reali se abbiamo ruotato ---
+#             if ref_angle != 0.0:
+#                 sequence = rotate_ns_sequence(sequence, ref_pivot, ref_angle)
+
+#     return sequence
+
 
 def place_sequence(doc, text, scale_factor, excluded_layers, space=1.5, min_char=5,\
                    max_char=20, arbitrary_x=None, arbitrary_y=None,\

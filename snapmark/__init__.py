@@ -78,14 +78,13 @@ from .utils.helpers import (
 from .checking.checking import (
     find_spec_holes,
     find_circle_centers,
-    find_longer_entity,
     print_layers as print_document_layers,
     print_entities,
 )
 
 
 # ========== METADATA ==========
-__version__ = "2.0.6"
+__version__ = "2.0.7"
 __author__ = "serg_you_lin"
 __all__ = [
     # Shortcuts (main API)
@@ -159,7 +158,6 @@ def __getattr__(name):
             DeprecationWarning,
             stacklevel=2
         )
-        # Per ora solleva errore (funzioni rimosse)
         raise AttributeError(f"Deprecated removed function: {name}")
     
     raise AttributeError(f"module 'snapmark' has no attribute '{name}'")

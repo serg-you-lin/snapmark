@@ -25,8 +25,8 @@ seq = sm.SequenceBuilder()
 
 ### Composition Methods
 
-#### `.file_name()`
-Adds the filename (without `.dxf` extension).
+#### `.file_name(trim_start=0, trim_end=0)`
+Adds the filename (without `.dxf` extension). Allows trimming characters from the start/end of the filename.
 
 ```python
 seq = sm.SequenceBuilder().file_name().build()

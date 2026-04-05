@@ -37,20 +37,6 @@ def find_spec_holes(doc, diametro_minimo=0, diametro_massimo=float('inf')):
         
     return holes
 
-# # Cerca fori specifici
-# def find_spec_holes(doc, diametro_minimo=0, diametro_massimo=float('inf')):
-#     holes = []  # Lista per memorizzare le entità circolari
-
-#     msp = doc.modelspace()  # Accedi al modello spaziale del disegno
-
-#     # Itera attraverso tutte le entità nel modello spaziale
-#     for entity in msp.query('CIRCLE'):  # Filtra solo le entità di tipo cerchio
-#         diametro = entity.dxf.radius * 2  # Calcola il diametro del cerchio
-#         if diametro_minimo <= diametro <= diametro_massimo:
-#             holes.append(entity)
-#             # print(entity)# Aggiungi l'entità circolare alla lista se rientra nel range di diametri
-        
-#     return holes
 
 def find_entities(file_path, entity_type):
     """Return a list of DXF entities of the given type from the specified file."""
@@ -71,63 +57,6 @@ def find_entities(file_path, entity_type):
 def print_entities(msp):
     for e in msp.query():
         print(e)
-
-
-
-# def find_longer_entity(entities):
-
-#     lato_piu_lungo = None
-#     lunghezza_lato_piu_lungo = 0
-#     lato_piu_lungo_is_sotto = True
-#     minimum_point = float('inf')
-#     # Itera tutte le linee nel modello
-#     for entity in entities:
-#         minimum_point = min(entity.dxf.start.y, entity.dxf.end.y, minimum_point)      
-#         # Calcola la lunghezza della linea utilizzando il teorema di Pitagora
-#         lunghezza = ((entity.dxf.start.x - entity.dxf.end.x) ** 2 + (entity.dxf.start.y - entity.dxf.end.y) ** 2) ** 0.5
-#         # Se la lunghezza della linea è maggiore della lunghezza massima finora trovata, aggiornala
-#         if lunghezza > lunghezza_lato_piu_lungo:
-#             lunghezza_lato_piu_lungo = lunghezza
-#             lato_piu_lungo = entity
-    
-#     # Controllare che il lato più lungo sia una linea perimetrale
-#     if min(lato_piu_lungo.dxf.start.y, lato_piu_lungo.dxf.end.y) > minimum_point:
-#         lato_piu_lungo_is_sotto = False
-    
-#     return lato_piu_lungo, lato_piu_lungo_is_sotto
-
-
-def find_longer_entity(entities):
-    """
-    Finds the longest entity among the given entities and checks if it is below a certain minimum point.
-    
-    Args:
-        entities: A list of entities to evaluate.
-    
-    Returns:
-        A tuple containing the longest entity and a boolean indicating if it is below the minimum point.
-    """
-    
-    longest_side = None
-    longest_side_length = 0
-    longest_side_is_below = True
-    minimum_point = float('inf')
-    
-    # Iterate through all the lines in the model
-    for entity in entities:
-        minimum_point = min(entity.dxf.start.y, entity.dxf.end.y, minimum_point)      
-        # Calculate the length of the line using the Pythagorean theorem
-        length = ((entity.dxf.start.x - entity.dxf.end.x) ** 2 + (entity.dxf.start.y - entity.dxf.end.y) ** 2) ** 0.5
-        # If the length of the line is greater than the maximum length found so far, update it
-        if length > longest_side_length:
-            longest_side_length = length
-            longest_side = entity
-    
-    # Check if the longest side is a perimeter line
-    if min(longest_side.dxf.start.y, longest_side.dxf.end.y) > minimum_point:
-        longest_side_is_below = False
-    
-    return longest_side, longest_side_is_below
 
 
 

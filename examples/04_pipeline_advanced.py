@@ -14,12 +14,13 @@ sys.path.insert(0, str(ROOT))
 import snapmark as sm
 
 def main():
-    folder = "examples/input"
+    folder = str(ROOT / "examples" / "input")
+    folder = r"c:\Users\FEDERICO\Documents\Python_Scripts\Projects\DXF\33-24\Giunti"
     
     # Build custom sequence
     seq = (sm.SequenceBuilder()
-           .file_name()
-           .folder(num_chars=2)
+           .file_name(trim_start=5)
+           #.folder(num_chars=2)
            .build())
     
     print("=== Pipeline: Align + Mark + Count ===")
@@ -30,7 +31,7 @@ def main():
     # Add multiple operations
     manager.add_operation(
         sm.Aligner(),  # Align drawing
-        sm.AddMark(seq, scale_factor=100, align='r'),  # Add marking
+        sm.AddMark(seq, scale_factor=100, align='c', max_char=20, min_char=10, down_to=5),  # Add marking
         sm.CountHoles(sm.find_circle_by_radius(min_diam=5, max_diam=10))  # Count holes
     )
     
