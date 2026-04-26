@@ -97,7 +97,17 @@ seq = sm.SequenceBuilder().file_name().build()
 sm.AddMark(seq, scale_factor=120, align='l', mark_layer='ENGRAVE', mark_color=5)
 ```
 
----
+### `AddText(text_sequence, **kwargs)`
+Adds native DXF MTEXT entities to the drawing. Unlike `AddMark`, text is not rendered as vector segments — CAM support may vary.
+
+**Parameters:**
+- `text_sequence`: ComposedText object from `TextBuilder`
+- For all other parameters (char_height, align, text_layer, text_color, etc.) → see `parameters.md`
+
+```python
+text = sm.TextBuilder().literal("PRODOTTO: acciaio").build()
+sm.AddText(text, char_height=3, align='l', text_layer='INFO')
+```
 
 ### `CountHoles(find_function, mess=False)`
 Counts circles matching specified criteria.
@@ -303,6 +313,21 @@ print(f"Total holes across all parts: {stats['total_count']}")
 ```
 
 ---
+
+### 7. Mark + Metadata: Vector Marking and Text Annotation
+```python
+seq = sm.SequenceBuilder().file_name().build()
+text = sm.TextBuilder().literal("MAT: S235JR").build()
+
+manager = sm.IterationManager("drawings/", use_backup_system=True)
+manager.add_operation(
+    sm.Aligner(),
+    sm.AddMark(seq, scale_factor=100),   # CAM-ready vector marking
+    sm.AddText(text, char_height=3)      # Human-readable annotation
+)
+manager.execute()
+```
+
 
 ## Single File Pipeline
 

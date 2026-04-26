@@ -68,13 +68,21 @@ class IterationManager:
         # Process files
         stats = {'processed': 0, 'modified': 0, 'errors': []}
         
-        for file_path in dxf_files:
-            success = self._process_single_file(str(file_path))
+        # for file_path in dxf_files:
+        #     success = self._process_single_file(str(file_path))
             
-            if success:
+        #     if success:
+        #         stats['processed'] += 1
+        #         stats['modified'] += 1
+        #     else:
+        #         stats['errors'].append(str(file_path))
+        for file_path in dxf_files:
+            processed, saved = self._process_single_file(str(file_path))
+            if processed:
                 stats['processed'] += 1
+            if saved:
                 stats['modified'] += 1
-            else:
+            if not processed:
                 stats['errors'].append(str(file_path))
 
         # Final messages
@@ -102,20 +110,20 @@ class IterationManager:
                 BackupManager.ensure_original(file_path)
             except PermissionError:
                 print(f"🔒 The file '{file_name}' is currently open in another application. Please close it and try again.")
-                return False
+                return False, False
             except Exception as e:
                 print(f"❌ Backup error on '{file_name}': {str(e)}")
-                return False
+                return False, False
 
         # --- OPEN FILE ---
         try:
             doc = ezdxf.readfile(file_path)
         except PermissionError:
             print(f"🔒 The file '{file_name}' is currently open in another application. Please close it and try again.")
-            return False
+            return False, False
         except Exception as e:
             print(f"❌ Cannot open '{file_name}': {str(e)}")
-            return False
+            return False, False
 
         # --- APPLY OPERATIONS ---
         should_save = False
@@ -126,21 +134,44 @@ class IterationManager:
                 operation.message(file_name)
             except Exception as e:
                 print(f"❌ Error processing '{file_name}': {str(e)}")
-                return False
+                return False, False  # processed=False, saved=False
 
         # --- SAVE ---
         if should_save:
             try:
                 doc.saveas(file_path)
-                return True
+                return True, True   # processed=True, saved=True
             except PermissionError:
-                print(f"🔒 Cannot save '{file_name}' because it is open in another application.")
-                return False
+                ...
+                return True, False  # processed=True, saved=False
             except Exception as e:
-                print(f"❌ Cannot save '{file_name}': {str(e)}")
-                return False
+                ...
+                return True, False
 
-        return False
+        return True, False          # processed=True, saved=False
+        # should_save = False
+        # for operation in self.operation_list:
+        #     try:
+        #         result = operation.execute(doc, folder, file_name)
+        #         should_save = should_save or result
+        #         operation.message(file_name)
+        #     except Exception as e:
+        #         print(f"❌ Error processing '{file_name}': {str(e)}")
+        #         return False
+
+        # # --- SAVE ---
+        # if should_save:
+        #     try:
+        #         doc.saveas(file_path)
+        #         return True
+        #     except PermissionError:
+        #         print(f"🔒 Cannot save '{file_name}' because it is open in another application.")
+        #         return False
+        #     except Exception as e:
+        #         print(f"❌ Cannot save '{file_name}': {str(e)}")
+        #         return False
+
+        # return False
     
     def _final_messages(self):
         """Prints final messages (e.g., from Counter)."""

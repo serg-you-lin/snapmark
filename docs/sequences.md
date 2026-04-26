@@ -1,7 +1,13 @@
 # Sequences
 
-Sequences define **what text** to engrave on DXF files.
-Using `SequenceBuilder`, you can compose complex marking text by combining filename parts, folder names, literals, and custom logic.
+This module covers two complementary builders:
+
+| Builder | Produces | Used by |
+|---|---|---|
+| `SequenceBuilder` | A single vektor marking string | `AddMark` |
+| `TextBuilder` | A list of text annotations lines | `AddText` |
+
+Both follow the same composable pattern: chain methods, call `.build()`, pass to the operation.
 
 ---
 
@@ -289,6 +295,99 @@ seq2 = from_splitted_text(separator='_', part_index=0)
 These are used internally by `mark_by_name()` and `mark_by_splitted_text()` shortcuts.
 
 ---
+
+---
+
+## TextBuilder
+
+`TextBuilder` is the counterpart of `SequenceBuilder` for `AddText` — it builds a list of text lines instead of a single marking string.
+
+**Analogy:** If `SequenceBuilder` assembles a single engraving string, `TextBuilder` assembles a multi-line label — like composing the lines of a post-it note attached to the drawing.
+
+### Constructor
+```python
+tb = sm.TextBuilder()
+```
+
+### Composition Methods
+
+#### `.static(text: str)`
+Adds a fixed text line.
+
+```python
+tb = sm.TextBuilder().static("MAT: S235JR").static("REV: 1").build()
+```
+
+---
+
+#### `.line(func: Callable[[str, str], str])`
+Adds a dynamic line computed from a function.
+
+**Function signature:**
+```python
+def my_line(folder_path: str, filename: str) -> str:
+    return "result"
+```
+
+```python
+tb = (sm.TextBuilder()
+      .line(lambda folder, f: f"FILE: {f}")
+      .static("REV: 1")
+      .build())
+```
+
+---
+
+#### `.build()`
+Finalizes and returns a `ComposedText` object usable in `AddText`.
+
+```python
+tb = sm.TextBuilder().static("NOTE: OK").build()
+# Now 'tb' is ready to be passed to AddText
+```
+
+**Note:** Raises `ValueError` if no lines have been defined.
+
+---
+
+### Common Patterns
+
+#### Static annotation
+```python
+tb = (sm.TextBuilder()
+      .static("MAT: S235JR")
+      .static("FINITURA: GREZZA")
+      .build())
+```
+
+#### Dynamic lines from filename
+```python
+import re
+
+def extract_material(folder, filename):
+    match = re.search(r'(S235|S355|INOX)', filename.upper())
+    return f"MAT: {match.group(1)}" if match else "MAT: ND"
+
+tb = (sm.TextBuilder()
+      .line(extract_material)
+      .static("REV: 1")
+      .build())
+```
+
+#### Used in pipeline with AddMark
+```python
+seq = sm.SequenceBuilder().file_name().build()
+tb = sm.TextBuilder().static("MAT: S235JR").build()
+
+manager = sm.IterationManager("drawings/", use_backup_system=True)
+manager.add_operation(
+    sm.Aligner(),
+    sm.AddMark(seq, scale_factor=100),  # vector marking
+    sm.AddText(tb, char_height=3)       # text annotation
+)
+manager.execute()
+```
+
 
 **Next steps:**
 - To apply sequences in batch → see `pipeline.md`

@@ -12,8 +12,10 @@ Contiene:
 """
 
 import math
+import numpy as np
 from dataclasses import dataclass, field
 from typing import Optional
+from ezdxf.math import bulge_to_arc
 
 
 ##############################################################################
@@ -260,56 +262,60 @@ def find_reference_entity(lines, lwpolylines, horizontal_threshold_deg=5.0):
         return min(all_segments, key=lambda s: (_min_y(s), _angle(s)))
     
 
-def ref_angle_and_pivot(ref_segment):
+def comp_centroid(vertex):
+    """Calculates the centroid of a given set of vertices."""
+    num_vertex = len(vertex)
+    sum_x = np.sum(vertex[:, 0])
+    sum_y = np.sum(vertex[:, 1])
+    centroid_x = sum_x / num_vertex
+    centroid_y = sum_y / num_vertex
+    return (centroid_x, centroid_y)
+
+
+def lwpolyline_to_segs(entity, min_arc_segs=15):
     """
-    Estrae angolo e pivot da un VirtualSegment di riferimento.
+    Converts a LWPOLYLINE into a list of segments (x1, y1, x2, y2).
+    Correctly handles bulge values by discretizing arcs.
 
     Args:
-        ref_segment: VirtualSegment (o qualsiasi oggetto con .dxf.start e .dxf.end)
+        entity: ezdxf LWPOLYLINE entity.
+        min_arc_segs: Minimum number of segments used to discretize an arc.
 
     Returns:
-        Tupla (angle, pivot) dove:
-            angle: float in radianti
-            pivot: tupla (x, y)
+        List of tuples (x1, y1, x2, y2).
     """
-    p1 = (ref_segment.dxf.start.x, ref_segment.dxf.start.y)
-    p2 = (ref_segment.dxf.end.x, ref_segment.dxf.end.y)
-    return seg_angle(p1, p2), p1
-
-
-##############################################################################
-# Rotazione della sequenza NS in coordinate reali
-##############################################################################
-
-def rotate_ns_sequence(sequence, pivot, angle):
-    """
-    Ruota tutti i punti di una sequenza NS attorno a un pivot.
-
-    Chiamato dopo place_sequence per riportare la sequenza trovata
-    in coordinate locali nelle coordinate reali del disegno.
-
-    La rotazione avviene su due livelli:
-    - position: il punto di ancoraggio del carattere nel disegno
-    - scaled_segments: i punti dei segmenti del glifo, ruotati
-      attorno all'origine (0,0) perché sono già relativi a position
-
-    Args:
-        sequence: Oggetto NS con .sequence lista di (scaled_segments, position)
-        pivot: Tupla (x, y) attorno a cui ruotare
-        angle: Angolo in radianti
-
-    Returns:
-        La stessa sequenza NS modificata in-place (per coerenza con place_sequence)
-    """
-    for scaled_segments, position in sequence.sequence:
-        # ruota il punto di ancoraggio nel disegno
-        rx, ry = rotate_point(position, pivot, angle)
-        position[0], position[1] = rx, ry
-
-        # ruota i punti del glifo attorno all'origine —
-        # sono coordinate relative, il pivot è (0, 0)
-        for point in scaled_segments:
-            px, py = rotate_point((point[0], point[1]), (0.0, 0.0), angle)
-            point[0], point[1] = px, py
-
-    return sequence
+    segs = []
+    verts = list(entity.get_points(format='xyseb'))
+    
+    if len(verts) < 2:
+        return segs
+    
+    pairs = list(zip(verts, verts[1:]))
+    if entity.closed:
+        pairs.append((verts[-1], verts[0]))
+    
+    for v1, v2 in pairs:
+        x1, y1, _, _, bulge = v1
+        x2, y2 = v2[0], v2[1]
+        
+        if abs(bulge) < 1e-6:
+            segs.append((x1, y1, x2, y2))
+        else:
+            center, start_angle, end_angle, radius = bulge_to_arc(
+                (x1, y1), (x2, y2), bulge
+            )
+            if start_angle > end_angle:
+                end_angle += 2 * math.pi
+            
+            num_segs = max(min_arc_segs, int(min_arc_segs + (radius // 2) *
+                          (end_angle - start_angle) / (2 * math.pi)))
+            
+            angles = np.linspace(start_angle, end_angle, num_segs + 1)
+            cx, cy = center.x, center.y
+            pts = [(cx + radius * math.cos(a),
+                    cy + radius * math.sin(a)) for a in angles]
+            
+            for p1, p2 in zip(pts, pts[1:]):
+                segs.append((p1[0], p1[1], p2[0], p2[1]))
+    
+    return segs

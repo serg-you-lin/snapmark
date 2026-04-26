@@ -1,7 +1,8 @@
 """Funzioni di convenienza per uso rapido."""
 import os
 from .sequence.sequence_system import from_file_name, from_splitted_text
-from .operations.basic_operations import AddMark, Operation
+from .operations.basic_operations import Operation
+from .operations.placement import AddMark
 from .utils.helpers import find_circle_by_radius
 from .operations.counter import CountHoles, Counter 
 
@@ -20,7 +21,7 @@ def mark_by_name(file_or_folder, align='c', min_char=5, max_char=20, start_y=1, 
     """
     import os
     
-    sequence = from_file_name()
+    sequence = from_file_name(trim_start=kwargs.pop('trim_start', 0), trim_end=kwargs.pop('trim_end', 0))
     mark_op = AddMark(sequence, align=align, min_char=min_char, max_char=max_char, start_y=start_y, **kwargs)
     
     if os.path.isfile(file_or_folder):
@@ -68,7 +69,7 @@ def mark_with_sequence(file_or_folder, sequence, align='c', min_char=5, max_char
         start_y (float): The starting y-coordinate for the search (default is 1).
     """
     
-    from .operations.basic_operations import AddMark, Operation
+    # from .operations.basic_operations import AddMark, Operation
     
     mark_op = AddMark(sequence, align=align, min_char=min_char, max_char=max_char, start_y=start_y, **kwargs)
     

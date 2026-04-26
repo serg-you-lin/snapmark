@@ -53,6 +53,9 @@ def add_numbers_to_layer(doc, sequence, number_layer = '0', number_color=None):
         # Add lines based on the segments at the scaled position
         scaled_position = position  # The position has already been scaled
         for i in range(len(scaled_segments) - 1):
+            if scaled_segments[i] is None or scaled_segments[i + 1] is None:
+                continue
+
             start_point = (
                 scaled_segments[i][0] + scaled_position[0],
                 scaled_segments[i][1] + scaled_position[1]
@@ -82,15 +85,13 @@ def delete_layer(doc, layer_name):
     """Deletes a specific layer and all entities associated with."""
     msp = doc.modelspace()
 
-    # Find all entities belonging to the specified layer
     entities_to_remove = [entity for entity in msp.query('*[layer=="{}"]'.format(layer_name))]
 
-    # Delete all entities associated with the layer
     for entity in entities_to_remove:
         msp.delete_entity(entity)
 
-    # Delete the layer
-    doc.layers.remove(layer_name)
+    if doc.layers.has_entry(layer_name):  # ← unica riga aggiunta
+        doc.layers.remove(layer_name)
 
 
             
@@ -127,5 +128,6 @@ def remove_entities(msp, entities_to_remove):
         msp.add_entity(entity.clone())
 
 
-
-
+def change_layer(entities, new_layer):
+    for entity in entities:
+        entity.set_dxf_attrib('layer', new_layer)

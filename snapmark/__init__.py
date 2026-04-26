@@ -23,11 +23,6 @@ Basic Usage:
 # ========== CORE: Main operations ==========
 from .operations.basic_operations import (
     Operation,
-    AddMark,
-    SubstituteCircle,
-    AddX,
-    RemoveCircle,
-    RemoveLayer,
     PrintLayers,
 )
 
@@ -37,11 +32,24 @@ from .operations.counter import (
     CountHoles,
 )
 
+from .operations.placement import (
+    AddText,
+    AddMark,
+)
+
+from .operations.modify import (
+    SubstituteCircle,
+    AddX,
+    RemoveCircle,
+    RemoveLayer,
+)
+
 from .operations.aligner import Aligner
 
 # ========== SEQUENCE (NEW SYSTEM) ==========
 from .sequence.sequence_system import (
     SequenceBuilder,
+    TextBuilder,
     from_file_name,
     from_splitted_text
 )
@@ -72,19 +80,15 @@ from .utils.helpers import (
     count_holes,
     find_all_circles,
     find_circle_by_radius,
-)
-
-# ========== CHECKING/SEARCH ==========
-from .checking.checking import (
-    find_spec_holes,
-    find_circle_centers,
-    print_layers as print_document_layers,
-    print_entities,
+    find_spec_holes,        
+    find_circle_centers,    
+    print_layers as print_document_layers,  
+    print_entities,         
 )
 
 
 # ========== METADATA ==========
-__version__ = "2.0.7"
+__version__ = "2.1.0"
 __author__ = "serg_you_lin"
 __all__ = [
     # Shortcuts (main API)
@@ -97,12 +101,14 @@ __all__ = [
     
     # Sequence Builder
     'SequenceBuilder',
+    'TextBuilder',
     'from_file_name',
     'from_splitted_text',
 
     # Operations
     'Operation',
     'AddMark',
+    'AddText',
     'AddCircle',
     'SubstituteCircle',
     'AddX',

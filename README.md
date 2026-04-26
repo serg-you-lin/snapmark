@@ -1,7 +1,8 @@
 # SnapMark
 
 SnapMark is a Python library for applying intelligent, customizable text markings and engraving paths on DXF (AutoCAD) files.
-It is designed to generate laser-engraving traces (not cutting paths) that make each part identifiable through incised labels, codes, and metadata. 
+It is designed to generate laser-engraving traces (not cutting paths) that make each part identifiable through incised labels, codes, and metadata.
+Markings are rendered as **vector segments** (polylines), not DXF text entities — ensuring compatibility with CAM software that reads geometry, not fonts.
 Built on top of the excellent [`ezdxf`](https://ezdxf.mozman.at/), it provides a simple API for marking, alignment, hole analysis, and batch processing — tailored for manufacturing, CNC workflows, and automated drawing preparation.
 
 [![PyPI version](https://badge.fury.io/py/snapmark.svg)](https://badge.fury.io/py/snapmark)
@@ -92,7 +93,8 @@ seq = (sm.SequenceBuilder()
 
 ### Operations (Advanced)
 
-- `AddMark(sequence)` - Add text marking
+- `AddMark(sequence)` - Add a numeric/alphanumeric marking rendered as **vector segments** (CAM-ready engraving paths)
+- `AddText(texts)` - Add a DXF MTEXT entity (native text, not vectors — CAM support may vary)
 - `Aligner()` - Aligns the drawing along its longest side in the X direction.
 - `CountHoles(find_func)` - Count circles
 - `AddX(find_func, x_size)` - Add X marks

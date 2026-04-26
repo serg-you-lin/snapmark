@@ -117,28 +117,51 @@ class FolderNameComponent(SequenceComponent):
         return folder_name
     
 
+import os
+
 class FilePartComponent(SequenceComponent):
-    """Represents a part of the file name using a specified separator."""
-    
-    def __init__(self, separator: str = '_', part_index: int = 0):
-        """
-        Initializes the FilePartComponent with a separator and part index.
+    """Represents a specific part of the file name split by a separator."""
 
+    def __init__(self, separator: str = "_", part_index: int = 0,
+                 trim_start: int = 0, trim_end: int = 0):
+        """
         Args:
-            separator (str): The character used to separate parts of the file name (default is '_').
-            part_index (int): The index of the part to extract (default is 0).
+            separator (str): Character used to split file name.
+            part_index (int): Index of the split part to return.
+            trim_start (int): Characters to remove from start of selected part.
+            trim_end (int): Characters to remove from end of selected part.
         """
-
         self.separator = separator
         self.part_index = part_index
-    
+        self.trim_start = trim_start
+        self.trim_end = trim_end
+
     def extract(self, folder: str, file_name: str) -> str:
-        """Returns the specified part of the file name based on the separator."""
-        base_name = os.path.splitext(file_name)[0]
-        parts = base_name.split(self.separator)
-        if 0 <= self.part_index < len(parts):
-            return parts[self.part_index]
-        return ""
+        # 1. remove extension
+        base = os.path.splitext(file_name)[0]
+
+        # 2. split
+        parts = base.split(self.separator)
+
+        if self.part_index >= len(parts):
+            raise ValueError(
+                f"part_index {self.part_index} out of range for file: {file_name}"
+            )
+
+        value = parts[self.part_index]
+
+        # 3. safety check trim
+        if self.trim_start < 0 or self.trim_end < 0:
+            raise ValueError("trim values must be >= 0")
+
+        # 4. apply trim (IDENTICAL LOGIC STYLE to FileNameComponent)
+        if self.trim_start + self.trim_end >= len(value):
+            return value
+
+        start = self.trim_start
+        end = None if self.trim_end == 0 else -self.trim_end
+
+        return value[start:end]
 
 
 class CustomComponent(SequenceComponent):
@@ -222,7 +245,7 @@ class SequenceBuilder:
         return self
 
 
-    def file_part(self, separator: str = '_', part_index: int = 0) -> 'SequenceBuilder':
+    def file_part(self, separator: str = '_', part_index: int = 0, trim_start: int = 0, trim_end: int = 0) -> 'SequenceBuilder':
         """
         Adds a part of the file name after splitting it.
         
@@ -235,9 +258,11 @@ class SequenceBuilder:
         Args:
             separator (str): The character used to separate parts (default is '_').
             part_index (int): The index of the part to extract (default is 0).
+            trim_start (int): Number of characters to trim from the start of the part.
+            trim_end (int): Number of characters to trim from the end of the part.
         """
 
-        self.components.append(FilePartComponent(separator, part_index))
+        self.components.append(FilePartComponent(separator, part_index, trim_start, trim_end))
         return self
     
     def custom(self, func: Callable[[str, str], str]) -> 'SequenceBuilder':
@@ -300,10 +325,9 @@ class ComposedSequence(Sequence):
 
 # ========== COMMON SHORTCUTS ==========
 
-def from_file_name() -> ComposedSequence:
-    """Shortcut: sequence with only the file name."""
-
-    return SequenceBuilder().file_name().build()
+def from_file_name(trim_start: int = 0, trim_end: int = 0) -> ComposedSequence:
+    """Shortcut: sequence with only the file name, optionally trimmed."""
+    return SequenceBuilder().file_name(trim_start=trim_start, trim_end=trim_end).build()
 
 
 def from_splitted_text(separator: str = '_', part_index: int = 0) -> ComposedSequence:
@@ -314,6 +338,103 @@ def from_splitted_text(separator: str = '_', part_index: int = 0) -> ComposedSeq
 def from_literal(text: str) -> ComposedSequence:
     """Shortcut: fixed text component."""
     return SequenceBuilder().literal(text).build()
+
+
+
+# ========== TEXT BUILDER ==========
+
+class TextLine(ABC):
+    """Base component - una riga di testo."""
+
+    @abstractmethod
+    def resolve(self, folder: str, file_name: str) -> str:
+        pass
+
+
+class StaticLine(TextLine):
+    """Riga di testo fissa."""
+
+    def __init__(self, text: str):
+        self.text = text
+
+    def resolve(self, folder: str, file_name: str) -> str:
+        return self.text
+
+
+class DynamicLine(TextLine):
+    """Riga di testo dinamica, calcolata da una funzione."""
+
+    def __init__(self, func: Callable[[str, str], str]):
+        self.func = func
+
+    def resolve(self, folder: str, file_name: str) -> str:
+        return self.func(folder, file_name)
+
+
+class ComposedText:
+    """
+    Lista di righe di testo composta da componenti statici e dinamici.
+    Prodotta da TextBuilder.build() — analoga a ComposedSequence per AddMark.
+    """
+
+    def __init__(self, lines: List[TextLine]):
+        self.lines = lines
+
+    def get_lines(self, folder: str, file_name: str) -> List[str]:
+        """Risolve tutte le righe per il file corrente."""
+        return [line.resolve(folder, file_name) for line in self.lines]
+
+
+class TextBuilder:
+    """
+    Costruisce liste di righe di testo in modo componibile.
+    Speculare a SequenceBuilder, ma produce List[str] invece di str.
+
+    Analogia: SequenceBuilder assembla una stringa per AddMark,
+              TextBuilder assembla una lista di righe per AddText.
+
+    Esempi:
+        # Righe statiche
+        tb = TextBuilder().static("REV:1").static("NOTE:OK").build()
+
+        # Righe dinamiche dal filename
+        tb = (TextBuilder()
+              .line(lambda folder, f: f"Mat:{parse(f)['material']}")
+              .line(lambda folder, f: f"Sp:{parse(f)['thickness']}")
+              .build())
+
+        # Mix con normalizzazione esterna
+        material_map = {"S235": "FE-DECAPATO"}
+        tb = (TextBuilder()
+              .line(lambda folder, f: f"Mat:{material_map.get(parse(f)['material'], parse(f)['material'])}")
+              .static("REV:1")
+              .build())
+    """
+
+    def __init__(self):
+        self._lines: List[TextLine] = []
+
+    def static(self, text: str) -> 'TextBuilder':
+        """Aggiunge una riga fissa."""
+        self._lines.append(StaticLine(text))
+        return self
+
+    def line(self, func: Callable[[str, str], str]) -> 'TextBuilder':
+        """
+        Aggiunge una riga dinamica.
+
+        Args:
+            func: funzione (folder, file_name) -> str
+        """
+        self._lines.append(DynamicLine(func))
+        return self
+
+    def build(self) -> ComposedText:
+        """Congela il builder e restituisce un ComposedText pronto all'uso."""
+        if not self._lines:
+            raise ValueError("TextBuilder: nessuna riga definita. Aggiungi almeno .static() o .line().")
+        return ComposedText(list(self._lines))
+
 
 
 # ========== OLD SYSTEM (DEPRECATED) ==========

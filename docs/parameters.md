@@ -1,7 +1,8 @@
 # Parameters - Basic operations
 
 ## AddMark
-Adds numerical markings to DXF files.
+Adds numerical markings to DXF files as **vector segments** (polylines) — not DXF text entities.
+This ensures full compatibility with CAM software that reads geometry rather than fonts, making the output suitable for laser engraving and CNC incision paths.
 
 | Parameter | Type | Description | Default |
 |-----------|------|-------------|---------|
@@ -17,9 +18,40 @@ Adds numerical markings to DXF files.
 | `step` | `float` | Vertical distance re-placement sequence (when previous positioning attempt fails). | 2 |
 | `margin` | `float` | Margin around the sequence. | 1 |
 | `down_to` | `float` or `None` | Additional lower limit for the minimum allowed character dimension, only used when the sequence fails to be placed using the standard min_char constraint. | None |
-| `mark_layer` | `str` | Layer where markings are added. | 'MARK' |
-| `mark_color` | `str` | DXF color index of marking (ACI). | None |
-| `excluded_layers` | `list[str]` or `None` | Layers to not consider to compute marking position. | None |
+| `mark_layer` | `str` | Layer where markings are added. | `'MARK'` |
+| `mark_color` | `int` or `None` | DXF color index of marking (ACI). | `None` |
+| `excluded_layers` | `list[str]` or `None` | Layers ignored entirely during placement computation (e.g. previous markings). Entities on these layers are invisible to the algorithm. | `None` |
+| `avoid_layers` | `list[str]` or `None` | Layers treated as physical obstacles during placement (e.g. bending lines, inner contours). Entities on these layers are visible to the algorithm but the marking will never overlap them. | `None` |
+
+> **Note:** If your DXF contains bending lines or inner contours that must not be overlapped by the marking, 
+> pass their layer names to `avoid_layers`. If you have a previous marking on a dedicated layer 
+> that should be ignored entirely, pass that layer to `excluded_layers`.
+> The vertical fallback (attempt 2) activates automatically when no valid space is found 
+> in the standard orientation — no configuration needed.
+
+---
+
+## AddText
+Adds DXF MTEXT entities to DXF files. Unlike `AddMark`, text is placed as a native DXF text object — not as vector segments. CAM support may vary.
+
+| Parameter | Type | Description | Default |
+|-----------|------|-------------|---------|
+| `text_sequence` | `ComposedText` | Object that provides the list of text lines to place. | **Required** |
+| `char_height` | `float` | Font height of the text (in mm). | 2 |
+| `align` | `str` | Horizontal alignment (`'l'`, `'c'`, `'r'`). | `'l'` |
+| `start_y` | `float` | Y position to start placement search. | 1 |
+| `step` | `float` | Vertical increment when repositioning after a failed attempt. | 2 |
+| `margin` | `float` | Margin around the text bounding box. | 1 |
+| `text_layer` | `str` | Layer where text entities are added. | `'TEXT'` |
+| `text_color` | `int` or `None` | DXF color index (ACI). | `30` |
+| `excluded_layers` | `list[str]` or `None` | See note below. | `None` |
+| `avoid_layers` | `list[str]` or `None` | See note below. | `None` |
+
+---
+
+> **Note on `excluded_layers` and `avoid_layers`:** 
+> Pass layer names to `excluded_layers` for entities that should be invisible to the placement algorithm (e.g. previous markings).
+> Pass layer names to `avoid_layers` for entities that act as physical obstacles — the marking or text will never overlap them (e.g. bending lines, inner contours).
 
 ---
 
