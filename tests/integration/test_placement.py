@@ -1,3 +1,4 @@
+
 """
 Test di integrazione per place_sequence e find_position
 
@@ -25,6 +26,8 @@ from snapmark.mark_algorithm import (
     SequenceText,
 )
 from snapmark.mark_algorithm.segment_text_geometry import rotate_segment_text_sequence
+from snapmark.mark_algorithm.segmenter import GeometryContext
+from snapmark.mark_algorithm.placer import find_space_for_sequence
 
 # ═══════════════════════════════════════════════════════════
 # HELPERS
@@ -46,6 +49,29 @@ def make_rotated_doc(angle_deg=45, width=200, height=100):
     msp = doc.modelspace()
     angle = math.radians(angle_deg)
     cx, cy = width / 2, height / 2
+    corners = [(-width/2, -height/2), (width/2, -height/2),
+               (width/2,  height/2), (-width/2,  height/2)]
+    rotated = [
+        (cx + x * math.cos(angle) - y * math.sin(angle),
+         cy + x * math.sin(angle) + y * math.cos(angle))
+        for x, y in corners
+    ]
+    for i in range(4):
+        msp.add_line(rotated[i], rotated[(i + 1) % 4])
+    return doc
+
+
+def make_tall_narrow_rotated_doc(angle_deg=90, width=200, height=10):
+    """
+    DXF sintetico alto e stretto ruotato.
+    Con angle=90 l'asse lungo diventa verticale: il Tentativo 1 non trova
+    spazio in X, e il Tentativo 2 deve intervenire.
+    Replica il caso reale che fallisce in produzione.
+    """
+    doc = ezdxf.new('R2010')
+    msp = doc.modelspace()
+    angle = math.radians(angle_deg)
+    cx, cy = 50, 50
     corners = [(-width/2, -height/2), (width/2, -height/2),
                (width/2,  height/2), (-width/2,  height/2)]
     rotated = [
@@ -146,12 +172,42 @@ class TestPlaceSequenceTentativo2(unittest.TestCase):
         result = call_place_sequence(doc, "123")
         self.assertTrue(sequence_is_inside_doc(result, doc))
 
+    def test_003_tall_narrow_attempt1_truly_fails(self):
+        """
+        Precondizione: il Tentativo 1 da solo NON trova spazio su un doc
+        alto e stretto ruotato a 90°. Se questo test rosso → il doc è
+        troppo generoso e non replica il caso reale.
+        """
+        doc = make_tall_narrow_rotated_doc(angle_deg=90)
+        ctx = GeometryContext(doc)
+        # dimensioni tipiche di una sequenza "123" con scale_factor standard
+        x, y = find_space_for_sequence(30, 8, ctx, 'c', 1, 2, 1)
+        print(f"\n[T1 isolato su doc stretto] x={x}, y={y}")
+        self.assertIsNone(x, "Il Tentativo 1 non dovrebbe trovare spazio su doc alto e stretto ruotato")
+
+    def test_004_tall_narrow_rotated_finds_space(self):
+        """
+        Caso reale: documento alto e stretto ruotato a 90°.
+        Il Tentativo 1 non trova spazio (vedi test_003), il Tentativo 2 deve trovarlo.
+        Se questo è rosso → il fallback è rotto.
+        """
+        doc = make_tall_narrow_rotated_doc(angle_deg=90)
+        result = call_place_sequence(doc, "123")
+        print(f"\n[T2 fallback su doc stretto] len={len(result.sequence)}")
+        self.assertGreater(len(result.sequence), 0)
+
+    def test_005_tall_narrow_sequence_inside_bounding_box(self):
+        """La sequenza posizionata dal fallback è dentro il bounding box del disegno."""
+        doc = make_tall_narrow_rotated_doc(angle_deg=90)
+        result = call_place_sequence(doc, "123")
+        self.assertTrue(sequence_is_inside_doc(result, doc))
+
 
 # ═══════════════════════════════════════════════════════════
-# rotate_ns_sequence — gestione None
+# rotate_segment_text_sequence — gestione None
 # ═══════════════════════════════════════════════════════════
 
-class TestRotateNsSequence(unittest.TestCase):
+class TestRotateSegmentTextSequence(unittest.TestCase):
 
     def test_001_none_in_segments_does_not_crash(self):
         """None nei segmenti del font non causa crash durante la rotazione."""
@@ -174,39 +230,8 @@ class TestRotateNsSequence(unittest.TestCase):
 
 
 # ═══════════════════════════════════════════════════════════
-# find_position — usato da AddText
+# place_text
 # ═══════════════════════════════════════════════════════════
-
-# class TestFindPosition(unittest.TestCase):
-
-#     def setUp(self):
-#         ma.x_intercept_cache.clear()
-#         ma.segments_cache = None
-
-#     def test_001_returns_valid_coordinates(self):
-#         """Rettangolo grande — find_position ritorna coordinate valide."""
-#         doc = make_rectangle_doc(200, 100)
-#         x, y = place_text(doc, width=30, height=10)
-#         print(f"\n[find_position] x={x} y={y}")
-#         self.assertIsNotNone(x)
-#         self.assertIsNotNone(y)
-
-#     def test_002_returns_none_if_no_space(self):
-#         """Rettangolo troppo piccolo — find_position ritorna None, None."""
-#         doc = make_rectangle_doc(2, 2)
-#         x, y = place_text(doc, width=100, height=50)
-#         print(f"[find_position] no space x={x} y={y}")
-#         self.assertIsNone(x)
-#         self.assertIsNone(y)
-
-#     def test_003_position_inside_bounding_box(self):
-#         """La posizione trovata è dentro il bounding box."""
-#         doc = make_rectangle_doc(200, 100)
-#         x, y = place_text(doc, width=30, height=10)
-#         self.assertGreaterEqual(x, 0)
-#         self.assertLessEqual(x, 200)
-#         self.assertGreaterEqual(y, 0)
-#         self.assertLessEqual(y, 100)
 
 class TestFindPosition(unittest.TestCase):
 

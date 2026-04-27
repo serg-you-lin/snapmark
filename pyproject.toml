@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "snapmark"
-version = "2.1.0"
+version = "2.1.1"
 description = "Python library for automated DXF file marking and manipulation to engrave your cut files"
 readme = "README.md"
 authors = [{name = "Federico Sidraschi"}]

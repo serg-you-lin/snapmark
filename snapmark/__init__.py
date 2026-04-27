@@ -88,7 +88,7 @@ from .utils.helpers import (
 
 
 # ========== METADATA ==========
-__version__ = "2.1.0"
+__version__ = "2.1.1"
 __author__ = "serg_you_lin"
 __all__ = [
     # Shortcuts (main API)

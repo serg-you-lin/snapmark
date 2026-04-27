@@ -32,6 +32,22 @@ class GeometryContext:
         self.avoid_segs = comp_avoid_segs(msp, avoid_layers) if avoid_layers else None
         self.x_intercept_cache = {}
 
+    @classmethod
+    def from_rotated(cls, original_ctx, segs_rotated, avoid_segs_rotated,
+                     min_x_r, min_y_r, max_x_r, max_y_r):
+        """Crea un ctx con geometria ruotata, senza rileggere il doc."""
+        obj = cls.__new__(cls)
+        obj.msp = original_ctx.msp
+        obj.is_2d = original_ctx.is_2d
+        obj.segs = segs_rotated
+        obj.avoid_segs = avoid_segs_rotated
+        obj.min_x = min_x_r
+        obj.min_y = min_y_r
+        obj.max_x = max_x_r
+        obj.max_y = max_y_r
+        obj.x_intercept_cache = {}
+        return obj
+    
 
 # Trasforma ogni entità in lista di segmenti espressi in tuple.
 def comp_segs_and_limits(msp, excluded_layers=None):
@@ -228,23 +244,6 @@ def find_x_intercept_raw(y, segs):
     return x_intercept
 
 
-# def find_x_intercept(y, segs):
-#     """Finds x-intercepts for a given y value from a list of segments."""
-#     key = round(y, 3)          
-#     if key in x_intercept_cache:  
-#         return x_intercept_cache[key]
-#     else:
-#         x_intercept = []
-#         for (start_x, start_y, end_x, end_y) in segs:
-#             if start_y >= y >= end_y or start_y <= y <= end_y:
-#                 if start_y != end_y:
-#                     x = (y - start_y)/(end_y - start_y) * (end_x - start_x) + start_x
-#                     x_intercept.append(x)
-        
-#         x_intercept.sort()
-#         x_intercept_cache[key] = x_intercept  
-#         return x_intercept
-# segmenter.py
 def find_x_intercept(y, segs, ctx=None):
     key = round(y, 3)
     cache = ctx.x_intercept_cache if ctx is not None else {}
