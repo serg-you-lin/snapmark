@@ -7,12 +7,14 @@ All shortcuts can process **both single files and entire folders**.
 
 ---
 
-## `mark_by_name(file_or_folder, **kwargs)`
+## `mark_by_name(file_or_folder, trim_start=0, trim_end=0, **kwargs)`
 
 Marks DXF files using the full filename (without extension) as the marking text.
 
 **Parameters:**
 - `file_or_folder` (str): Path to a DXF file or folder containing DXF files
+- `trim_start` (int): Number of characters to trim from the start of the filename. Default: 0
+- `trim_end` (int): Number of characters to trim from the end of the filename. Default: 0
 - `align` (str): Text alignment - 'l' (left), 'c' (center), 'r' (right). Default: 'c'
 - `min_char` (int): Minimum character height. Default: 5
 - `max_char` (int): Maximum character height. Default: 20
@@ -30,15 +32,19 @@ sm.mark_by_name("part.dxf")
 # Folder with custom alignment and size
 sm.mark_by_name("drawings/", align='l', min_char=8, max_char=15)
 
+# Trim suffix
+# "10000123.dxf" → "123"
+sm.mark_by_name("part.dxf", trim_start=5)
+
 # With scale factor and custom layer
 sm.mark_by_name("drawings/", scale_factor=150, mark_layer='LABEL')
 ```
 
-**Use case:** Quick identification when filenames already contain product codes.
+**Use case:** Quick identification when filenames already contain product codes, with optional cleanup.
 
 ---
 
-## `mark_by_splitted_text(file_or_folder, separator='_', part_index=0, **kwargs)`
+## `mark_by_splitted_text(file_or_folder, separator='_', part_index=0, trim_start=0, trim_end=0, **kwargs)`
 
 Marks using a specific portion of the filename, split by a separator character.
 
@@ -48,6 +54,8 @@ Useful when filenames contain structured information (e.g., `PART_123_5mm.dxf`).
 - `file_or_folder` (str): Path to file or folder
 - `separator` (str): Character/string used to split the filename. Default: '_'
 - `part_index` (int): Index of the part to extract (0-based). Default: 0
+- `trim_start` (int): Number of characters to trim from the start of the extracted part. Default: 0
+- `trim_end` (int): Number of characters to trim from the end of the extracted part. Default: 0
 - `align` (str): Text alignment. Default: 'c'
 - `min_char` (int): Minimum character height. Default: 5
 - `max_char` (int): Maximum character height. Default: 20
@@ -63,6 +71,14 @@ sm.mark_by_splitted_text("drawings/", separator='_', part_index=0)
 
 # File: "PROD-A123-REV2.dxf" → marks "A123"
 sm.mark_by_splitted_text("drawings/", separator='-', part_index=1)
+
+# Trim prefix from extracted part
+# "ID_S532.dxf" → "532"
+sm.mark_by_splitted_text("drawings/", part_index=1, trim_start=1)
+
+# Trim suffix
+# "S532REV.dxf" → "S532"
+sm.mark_by_splitted_text("drawings/", separator='_', part_index=0, trim_end=3)
 
 # With custom parameters
 sm.mark_by_splitted_text("drawings/", 

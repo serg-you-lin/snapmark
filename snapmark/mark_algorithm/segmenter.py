@@ -276,24 +276,6 @@ def find_intermediate_y(bottom_y, top_y, int_step=2):
     return steps
 
 
-def prepare_geometry_context(doc, excluded_layers=None, avoid_layers=None):
-    global segments_cache
-    x_intercept_cache.clear()
-    segments_cache = None
-
-    msp = doc.modelspace()
-    segments_cache = comp_segs_and_limits(msp, excluded_layers)
-    segs, min_x, min_y, max_x, max_y, is_2d = segments_cache
-
-    if not is_2d:
-        file_name = doc.filename if hasattr(doc, 'filename') else 'unknown file'
-        raise ValueError(dxf_3d_geometry_error(file_name))
-
-    avoid_segs = comp_avoid_segs(msp, avoid_layers) if avoid_layers else None
-
-    return msp, segs, min_x, min_y, max_x, max_y, is_2d, avoid_segs
-
-
 def comp_center_point(doc):
     """Calculates the center point of all lines in the DXF document."""
     msp = doc.modelspace()

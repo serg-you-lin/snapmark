@@ -119,6 +119,41 @@ def call_place_sequence(doc, text="123"):
         align='c', start_y=1, step=2, margin=1, down_to=None
     )
 
+def make_u_shape_doc(outer_w=578, outer_h=178, u_depth=34, u_thickness=1):
+    """
+    DXF sintetico che replica il caso GRID-PD:
+    rettangolo esterno + contorno interno a U molto sottile con apertura in alto.
+    La linea orizzontale superiore della U è il bordo che find_x_intercept
+    non vede (segmento parallelo al raggio di scansione).
+    """
+    doc = ezdxf.new('R2010')
+    msp = doc.modelspace()
+
+    # Rettangolo esterno
+    pts = [(0, 0), (outer_w, 0), (outer_w, outer_h), (0, outer_h)]
+    for i in range(4):
+        msp.add_line(pts[i], pts[(i + 1) % 4])
+
+    # U interna: apertura in alto, molto sottile
+    u_top    = outer_h - 20          # y della linea orizzontale superiore (il bordo invisibile)
+    u_bottom = u_top - u_depth
+    u_left   = 20
+    u_right  = outer_w - 20
+    gap_left  = u_left  + u_thickness
+    gap_right = u_right - u_thickness
+
+    # lato sinistro verticale
+    msp.add_line((u_left, u_top), (u_left, u_bottom))
+    # fondo orizzontale
+    msp.add_line((u_left, u_bottom), (u_right, u_bottom))
+    # lato destro verticale
+    msp.add_line((u_right, u_bottom), (u_right, u_top))
+    # segmento orizzontale superiore sinistro (il bordo incriminato)
+    msp.add_line((u_left, u_top), (gap_left, u_top))
+    # segmento orizzontale superiore destro
+    msp.add_line((gap_right, u_top), (u_right, u_top))
+
+    return doc, u_top
 
 # ═══════════════════════════════════════════════════════════
 # place_sequence — Tentativo 1
@@ -261,6 +296,87 @@ class TestFindPosition(unittest.TestCase):
         self.assertGreaterEqual(y, 0)
         self.assertLessEqual(y, 100)
 
+# ═══════════════════════════════════════════════════════════
+# Bug regression — segmenti orizzontali invisibili
+# ═══════════════════════════════════════════════════════════
+
+class TestHorizontalSegmentBug(unittest.TestCase):
+    """
+    Regression per il bug: find_x_intercept ignora i segmenti orizzontali
+    (start_y == end_y), quindi il bordo superiore di una U molto sottile
+    è invisibile al raggio di scansione e l'algoritmo ci piazza dentro
+    la marcatura anche se lo spazio è occupato.
+    """
+
+    def test_001_sequence_not_placed_inside_u(self):
+        """
+        La sequenza NON deve essere piazzata dentro la U.
+        Prima della fix, l'algoritmo scavalcava il bordo orizzontale
+        e restituiva una posizione nel corpo della U.
+        """
+        doc, u_top = make_u_shape_doc()
+        result = call_place_sequence(doc, "123")
+        self.assertGreater(len(result.sequence), 0, "La sequenza deve essere piazzata da qualche parte")
+
+        u_bottom = u_top - 34
+        for _, position in result.sequence:
+            y = position[1]
+            self.assertFalse(
+                u_bottom < y < u_top,
+                f"La sequenza è stata piazzata dentro la U (y={y:.2f}, range U: {u_bottom:.2f}–{u_top:.2f})"
+            )
+
+    def test_002_sequence_not_overlapping_u_region(self):
+        """
+        La sequenza deve occupare uno spazio che non si sovrappone verticalmente
+        alla U. Può stare sopra o sotto — l'importante è che non la attraversi.
+        """
+        doc, u_top = make_u_shape_doc()
+        result = call_place_sequence(doc, "123")
+        self.assertGreater(len(result.sequence), 0)
+
+        scale_factor = comp_sf(doc, scale_factor=50)
+        seq_height = 10  # approssimazione conservativa
+
+        u_bottom = u_top - 34
+
+        for _, position in result.sequence:
+            y_seq_bottom = position[1]
+            y_seq_top    = position[1] + seq_height
+            overlap = y_seq_bottom < u_top and y_seq_top > u_bottom
+            self.assertFalse(
+                overlap,
+                f"La sequenza si sovrappone alla U "
+                f"(seq y={y_seq_bottom:.2f}–{y_seq_top:.2f}, U y={u_bottom:.2f}–{u_top:.2f})"
+            )
+            
+    def test_003_horizontal_border_coincides_with_scan_ray(self):
+        """
+        Caso limite: il raggio di scansione passa esattamente sulla linea
+        orizzontale superiore della U (y == u_top).
+        Verifica che find_space_between_interceptions la rilevi comunque.
+        """
+        doc, u_top = make_u_shape_doc()
+        ctx = GeometryContext(doc)
+
+        from snapmark.mark_algorithm.placer import find_space_between_interceptions
+        from snapmark.mark_algorithm.segmenter import find_x_intercept
+
+        # Raggio esattamente sulla linea orizzontale della U
+        x_intercept = find_x_intercept(u_top, ctx.segs, ctx)
+        x_left = x_intercept[0] if len(x_intercept) >= 2 else 0
+        x_right = x_intercept[1] if len(x_intercept) >= 2 else 578
+
+        # Lo spazio dentro la U NON deve essere considerato libero
+        result = find_space_between_interceptions(
+            x_left=20, x_right=558,
+            lenght_sequence=30, height_sequence=20,
+            segs=ctx.segs, margin=1,
+            y=u_top - 20,  # bottom del bbox candidato coincide con u_top
+            avoid_segs=ctx.avoid_segs,
+            ctx=ctx
+        )
+        self.assertFalse(result, "Lo spazio che attraversa il bordo orizzontale della U non deve essere libero")
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
