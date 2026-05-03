@@ -23,7 +23,7 @@ def main():
                     mark_color=4, trim_start=0, mark_layer="ENGRAVE", avoid_layers=["Bend, MBend"])
     
     # For files like "PART_123_Q5.dxf", this marks only "PART"
-    sm.mark_by_split_text(folder_2, separator='_', part_index=0, scale_factor=50, mark_layer="ENGRAVE")
+    sm.mark_by_split_text(folder_2, separator='_', part_index=0, scale_factor=50, mark_layer="ENGRAVE", trim_start=1)
     
     print("\n✅ Basic marking completed!")
 

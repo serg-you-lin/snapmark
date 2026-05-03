@@ -47,7 +47,7 @@ def mark_by_split_text(file_or_folder, separator='_', part_index=0,
         **kwargs: Other parameters for AddMark
     """
     
-    sequence = from_split_text(separator, part_index)
+    sequence = from_split_text(separator, part_index, trim_start=kwargs.pop('trim_start', 0), trim_end=kwargs.pop('trim_end', 0))
     mark_op = AddMark(sequence, align=align, min_height=min_height, max_height=max_height, start_y=start_y, **kwargs)
     
     if os.path.isfile(file_or_folder):
