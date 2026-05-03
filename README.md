@@ -71,7 +71,7 @@ sm.mark_with_sequence("path/to/drawings", seq, scale_factor=100)
 ### Shortcuts (Simple Usage)
 
 - `mark_by_name(folder)` - Mark with filename
-- `mark_by_splitted_text(folder, separator, part_index)` - Mark with filename part
+- `mark_by_split_text(folder, separator, part_index)` - Mark with filename part
 - `mark_with_sequence(folder, sequence)` - Mark with custom sequence
 - `quick_count_holes(folder, min_diam, max_diam)` - Count holes
 - `restore_backup(folder)` - Restore from backups
@@ -108,7 +108,7 @@ seq = (sm.SequenceBuilder()
 
 ## Requirements
 
-- Python 3.8+
+- Python 3.10+
 - ezdxf >= 1.0.0
 
 ## Contributing

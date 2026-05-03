@@ -12,16 +12,16 @@ from snapmark.entities.editor import add_numbers_to_layer
 class AddMark(Operation):
     """Adding numeric marking to DXF files."""
     
-    def __init__(self, sequence, scale_factor=50, space=1.5, min_char=5,
-                 max_char=20, arbitrary_x=None, arbitrary_y=None, align='c',
+    def __init__(self, sequence, scale_factor=50, space=1.5, min_height=5,
+                 max_height=20, arbitrary_x=None, arbitrary_y=None, align='c',
                  start_y=1, step=2, margin=1, down_to=None, mark_layer='MARK', 
                  mark_color=None, excluded_layers=None, avoid_layers=None):
         super().__init__()
         self.sequence = sequence
         self.scale_factor = scale_factor
         self.space = space
-        self.min_char = min_char
-        self.max_char = max_char
+        self.min_char_height = min_height
+        self.max_char_height = max_height
         self.arbitrary_x = arbitrary_x
         self.arbitrary_y = arbitrary_y
         self.align = align
@@ -47,7 +47,7 @@ class AddMark(Operation):
 
         seq = place_sequence(
             doc, sequence, scale_factor, self.excluded_layers, self.avoid_layers, self.space, 
-            self.min_char, self.max_char, self.arbitrary_x, self.arbitrary_y, 
+            self.min_char_height, self.max_char_height, self.arbitrary_x, self.arbitrary_y, 
             self.align, self.start_y, self.step, self.margin, self.down_to
         )
 

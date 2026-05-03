@@ -109,65 +109,6 @@ def find_space_for_sequence(lenght_sequence, height_sequence, ctx, align, start_
             return None, None
         return start_x, start_y
     
-
-# def find_space_between_interceptions(x_left, x_right, lenght_sequence, height_sequence, segs, margin, y, avoid_segs=None, ctx=None):   
-#     """
-#     Checks if there is enough space between interceptions for a given sequence.
-
-#     Args:
-#         x_left (float): The left boundary of the space to check.
-#         x_right (float): The right boundary of the space to check.
-#         lenght_sequence (float): The length of the sequence to be placed.
-#         height_sequence (float): The height of the sequence to be placed.
-#         segs (list): A list of segments to check for interceptions.
-#         margin (float): The margin to be added to the sequence length.
-#         y (float): The y-coordinate to check for interceptions.
-#         avoid_segs (list, optional): A list of segments to avoid (es. bending lines, inner contours).
-#         ctx (GeometryContext, optional): The geometry context for caching.
-
-#     Returns:
-#         bool: True if there is enough space for the sequence, False otherwise.
-#     """           
-
-#     if (lenght_sequence + 2*margin) <= (x_right - x_left):
-#         y_ints = find_intermediate_y(y, y + height_sequence)
-#         for y_int in y_ints:
-#             x_intercept = find_x_intercept(y_int, segs, ctx)
-#             for interception in x_intercept:
-#                 if x_right > interception > x_left:
-#                     return False
-                
-#         if avoid_segs:
-#             for (x1, y1, x2, y2) in avoid_segs:
-#                 if abs(y1 - y2) < 1e-6:
-#                     if y < y1 < y + height_sequence:
-#                         x_min_seg = min(x1, x2)
-#                         x_max_seg = max(x1, x2)
-#                         if x_min_seg < x_right and x_max_seg > x_left:
-#                             return False
-
-#         y_ints = find_intermediate_y(y, y + height_sequence)
-#         for y_int in y_ints:
-#             x_intercept = find_x_intercept(y_int, segs, ctx)         
-#             for interception in x_intercept:
-#                 if x_right > interception > x_left:
-#                     return False
-
-#             if avoid_segs:
-#                 x_avoid = find_x_intercept_raw(y_int, avoid_segs)
-#                 if len(x_avoid) >= 2:
-#                     mid = (x_left + x_right) / 2
-#                     for i in range(0, len(x_avoid) - 1, 2):
-#                         if x_avoid[i] < mid < x_avoid[i+1]:
-#                             return False
-#                     for interception in x_avoid:
-#                         if x_left < interception < x_right:
-#                             return False
-                
-#         return True
-#     else:
-#         return False
-    
   
 def find_space_between_interceptions(x_left, x_right, lenght_sequence, height_sequence, segs, margin, y, avoid_segs=None, ctx=None):
     EPS = 1e-6

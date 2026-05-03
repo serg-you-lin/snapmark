@@ -114,7 +114,7 @@ def call_place_sequence(doc, text="123"):
     return place_sequence(
         doc, text, scale_factor,
         excluded_layers=None, avoid_layers=None,
-        space=1.5, min_char=5, max_char=20,
+        space=1.5, min_char_height=5, max_char_height=20,
         arbitrary_x=None, arbitrary_y=None,
         align='c', start_y=1, step=2, margin=1, down_to=None
     )
@@ -273,7 +273,7 @@ class TestFindPosition(unittest.TestCase):
     def test_001_returns_valid_coordinates(self):
         """Rettangolo grande — place_text ritorna coordinate valide."""
         doc = make_rectangle_doc(200, 100)
-        x, y, w, h = place_text(doc, texts=["ABC"], min_char=5)
+        x, y, w, h = place_text(doc, texts=["ABC"], char_height=5)
         self.assertIsNotNone(x)
         self.assertIsNotNone(y)
 
@@ -283,14 +283,14 @@ class TestFindPosition(unittest.TestCase):
         lines = list(msp.query('LINE'))
         for l in lines:
             print(f"line: {l.dxf.start} -> {l.dxf.end}")
-        x, y, w, h = place_text(doc, texts=["ABC"], min_char=5)
+        x, y, w, h = place_text(doc, texts=["ABC"], char_height=5)
         self.assertIsNone(x)
         self.assertIsNone(y)
 
     def test_003_position_inside_bounding_box(self):
         """La posizione trovata è dentro il bounding box."""
         doc = make_rectangle_doc(200, 100)
-        x, y, w, h = place_text(doc, texts=["ABC"], min_char=5)
+        x, y, w, h = place_text(doc, texts=["ABC"], char_height=5)
         self.assertGreaterEqual(x, 0)
         self.assertLessEqual(x, 200)
         self.assertGreaterEqual(y, 0)

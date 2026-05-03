@@ -90,7 +90,7 @@ Adds text marking to the drawing.
 
 **Parameters:**
 - `sequence`: Sequence object from `SequenceBuilder`
-- For all other parameters (scale_factor, align, min_char, max_char, mark_layer, etc.) → see `parameters.md`
+- For all other parameters (scale_factor, align, char_height, char_height, mark_layer, etc.) → see `parameters.md`
 
 ```python
 seq = sm.SequenceBuilder().file_name().build()

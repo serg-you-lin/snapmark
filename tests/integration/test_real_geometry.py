@@ -80,8 +80,8 @@ def make_mark_op():
         sm.SequenceBuilder().file_part(trim_start=5).build(),
         scale_factor=100,
         align='c',
-        max_char=12,
-        min_char=8,
+        max_height=12,
+        min_height=8,
         down_to=5,
     )
 
@@ -108,8 +108,8 @@ def make_mark_op_narrow():
         sm.SequenceBuilder().literal("123").build(),
         scale_factor=50,
         align='c',
-        max_char=8,
-        min_char=3,
+        max_height=8,
+        min_height=3,
         down_to=2,
     )
 # ═══════════════════════════════════════════════════════════
@@ -207,8 +207,8 @@ class TestAvoidLayers(unittest.TestCase):
         op = sm.AddMark(
             sm.SequenceBuilder().literal("TEST").build(),
             scale_factor=50,
-            min_char=5,
-            max_char=15,
+            min_height=5,
+            max_height=15,
             avoid_layers=['MARCATURA'],
         )
         op.execute(doc, FOLDER, FILE)
@@ -237,8 +237,8 @@ class TestAvoidLayers(unittest.TestCase):
         op = sm.AddMark(
             sm.SequenceBuilder().literal("TEST").build(),
             scale_factor=50,
-            min_char=5,
-            max_char=15,
+            min_height=5,
+            max_height=15,
         )
         op.execute(doc, FOLDER, FILE)
         self.assertGreater(len(op.sequence_position.sequence), 0)

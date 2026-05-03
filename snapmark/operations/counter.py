@@ -109,19 +109,19 @@ class CountFiles(Counter):
 class CountHoles(Counter):
     """Counts holes (circles) in DXF files."""
     
-    def __init__(self, find_circle_function, mess=False):
+    def __init__(self, find_circle_function, verbose=False):
         """
         Initializes the CountHoles operation with the specified parameters.
 
         Args:
             find_circle_function: Function that finds circles in the document.
                                   Example: find_circle_by_radius(min_diam=5, max_diam=10).
-            mess (bool): If True, prints a message for each file (default is False).
+            verbose (bool): If True, prints a message for each file (default is False).
         """
 
         super().__init__()
         self.find_circle_function = find_circle_function
-        self.mess = mess
+        self.verbose = verbose
         self.holes_count = None
         self.function = None  # For optional multiplier (see mult())
     
@@ -139,7 +139,7 @@ class CountHoles(Counter):
     
     def message(self, file_name):
         """Optional message for a single file."""
-        if self.mess:
+        if self.verbose:
             if not self.holes_count or self.holes_count == 0:
                 print(f"  {file_name}: no holes found")
             else:

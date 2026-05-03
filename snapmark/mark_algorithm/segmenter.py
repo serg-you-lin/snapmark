@@ -12,12 +12,6 @@ from snapmark.utils.geometry import lwpolyline_to_segs
 
 MIN_ARC_SEGS = 15
 
-# # Global variable to store all y values, allowing retrieval if y has already been calculated.
-# x_intercept_cache = {}
-
-# # Global variable to cache segments and avoid recalculation
-# segments_cache = None
-
 class GeometryContext:
     def __init__(self, doc, excluded_layers=None, avoid_layers=None):
         msp = doc.modelspace()
@@ -35,7 +29,7 @@ class GeometryContext:
     @classmethod
     def from_rotated(cls, original_ctx, segs_rotated, avoid_segs_rotated,
                      min_x_r, min_y_r, max_x_r, max_y_r):
-        """Crea un ctx con geometria ruotata, senza rileggere il doc."""
+        """Creates a new context with rotated geometry, without re-reading the document."""
         obj = cls.__new__(cls)
         obj.msp = original_ctx.msp
         obj.is_2d = original_ctx.is_2d

@@ -9,8 +9,8 @@ This ensures full compatibility with CAM software that reads geometry rather tha
 | `sequence` | `Sequence` | Object that provides the sequence text for marking. | **Required** |
 | `scale_factor` | `float` | Scaling factor for the marking size. | 50 |
 | `space` | `float` | Space between characters in the sequence. | 1.5 |
-| `min_char` | `int` | Minimum characters dimension allowed (in mm). | 5 |
-| `max_char` | `int` | Maximum characters dimension allowed (in mm). | 20 |
+| `min_height` | `int` | Minimum characters dimension allowed (in mm). | 5 |
+| `max_height` | `int` | Maximum characters dimension allowed (in mm). | 20 |
 | `arbitrary_x` | `float` or `None` | X coordinate for manual positioning. | None |
 | `arbitrary_y` | `float` or `None` | Y coordinate for manual positioning. | None |
 | `align` | `str` | Alignment of the text ('c', 'l', 'r'). | 'c' |
@@ -237,14 +237,14 @@ Counts circles (holes) in DXF files.
 | Parameter | Type | Description | Default |
 |-----------|------|-------------|---------|
 | `find_circle_function` | callable | Function that returns circle entities from a DXF document. | N/A |
-| `mess` | bool | If True, prints per-file hole count. | False |
+| `verbose` | bool | If True, prints per-file hole count. | False |
 
 **Methods:**
 - `mult(function)`: Apply a multiplier function based on file name. Useful to account for quantities encoded in file names.
 
 **Notes:**
 - `execute()` counts holes in the current file and adds to `counter`.  
-- `message()` prints per-file count if `mess=True`.  
+- `message()` prints per-file count if `verbose=True`.  
 - `count_message()` prints: `"✓ Total holes: X"`.  
 
 ---

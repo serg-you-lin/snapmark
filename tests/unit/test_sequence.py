@@ -23,7 +23,7 @@ from snapmark.sequence.sequence_system import (
     SequenceBuilder,
     ComposedSequence,
     from_file_name,
-    from_splitted_text,
+    from_split_text,
     from_literal,
 )
 
@@ -299,9 +299,9 @@ class TestShortcuts(unittest.TestCase):
         seq = from_file_name(trim_start=5)
         self.assertEqual(seq.get_sequence_text(FOLDER, FILE), "123_A_SP5_Q2")
 
-    def test_003_from_splitted_text(self):
-        """from_splitted_text restituisce la parte corretta."""
-        seq = from_splitted_text(separator="_", part_index=0)
+    def test_003_from_split_text(self):
+        """from_split_text restituisce la parte corretta."""
+        seq = from_split_text(separator="_", part_index=0)
         self.assertEqual(seq.get_sequence_text(FOLDER, FILE), "PART")
 
     def test_004_from_literal(self):

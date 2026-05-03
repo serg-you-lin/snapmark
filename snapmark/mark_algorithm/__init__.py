@@ -13,7 +13,7 @@ from snapmark.utils.geometry import rotate_segs
 from snapmark.utils.segments_dict import number_segments_dict
 
 
-def place_text(doc, texts, min_char, excluded_layers=None, avoid_layers=None,
+def place_text(doc, texts, char_height, excluded_layers=None, avoid_layers=None,
                align='l', start_y=1, step=2, margin=1, debug_bbox=True):
     """
     Finds an available position for real DXF text entities (using font metrics) 
@@ -22,7 +22,7 @@ def place_text(doc, texts, min_char, excluded_layers=None, avoid_layers=None,
     Args:
         doc: ezdxf document.
         texts: List of strings to be placed.
-        min_char: Font height used for bounding box calculation.
+        char_height: Height of each character used for bounding box calculation.
         excluded_layers: Layers to ignore during collision check.
         avoid_layers: Specific layers to treat as obstacles.
         align: Horizontal alignment ('l', 'c', 'r').
@@ -38,7 +38,7 @@ def place_text(doc, texts, min_char, excluded_layers=None, avoid_layers=None,
     if all(len(text) == 0 for text in texts):
         raise Exception('Empty text.')
 
-    width, height = comp_text_bbox(texts, min_char)
+    width, height = comp_text_bbox(texts, char_height)
     ctx = GeometryContext(doc, excluded_layers, avoid_layers)
     x, y = find_space_for_sequence(width, height, ctx, align, start_y, step, margin)
 
@@ -55,7 +55,7 @@ def place_text(doc, texts, min_char, excluded_layers=None, avoid_layers=None,
     return x, y, width, height
 
 
-def _scale_sequence_to_bounds(segment_text, scale_factor, x_pos, y_pos, space, min_char, max_char):
+def _scale_sequence_to_bounds(segment_text, scale_factor, x_pos, y_pos, space, min_char_height, max_char_height):
     """
     Scala la sequenza rispettando i limiti min_char e max_char.
     Ritorna (sequence, scale_factor, lenght_sequence, height_sequence).
@@ -75,10 +75,10 @@ def _scale_sequence_to_bounds(segment_text, scale_factor, x_pos, y_pos, space, m
             ys = [pt[1] for pt in valid]
             height_raw = max(max(ys) - min(ys), height_raw)
 
-    if height_raw < min_char:
-        scale_factor = scale_factor / height_raw * min_char
-    elif height_raw > max_char:
-        scale_factor = scale_factor / height_raw * max_char
+    if height_raw < min_char_height:
+        scale_factor = scale_factor / height_raw * min_char_height
+    elif height_raw > max_char_height:
+        scale_factor = scale_factor / height_raw * max_char_height
 
     sequence = rescale_sequence(segment_text, scale_factor, x_pos, y_pos)
     lenght_sequence, height_sequence = sequence_dim(sequence, x_pos, y_pos, space)
@@ -186,7 +186,7 @@ def _attempt2(segment_text, sequence, scale_factor, lenght_sequence, height_sequ
 
 
 def place_sequence(doc, segment_text, scale_factor, excluded_layers=None, avoid_layers=None, space=1.5,
-                   min_char=5, max_char=20, arbitrary_x=None, arbitrary_y=None, align='c',
+                   min_char_height=5, max_char_height=20, arbitrary_x=None, arbitrary_y=None, align='c',
                    start_y=1, step=2, margin=1, down_to=None, ref_entity=None,
                    forced_height=None, forced_width=None):
     """
@@ -210,11 +210,11 @@ def place_sequence(doc, segment_text, scale_factor, excluded_layers=None, avoid_
     y_pos = 0 if arbitrary_y is None else arbitrary_y
 
     if down_to is None:
-        down_to = min_char
+        down_to = min_char_height
 
     # ── Scala la sequenza rispettando min/max char ─────────────────────────
     sequence, scale_factor, lenght_sequence, height_sequence = _scale_sequence_to_bounds(
-        segment_text, scale_factor, x_pos, y_pos, space, min_char, max_char
+        segment_text, scale_factor, x_pos, y_pos, space, min_char_height, max_char_height
     )
 
     if forced_height is not None:

@@ -68,14 +68,6 @@ class IterationManager:
         # Process files
         stats = {'processed': 0, 'modified': 0, 'errors': []}
         
-        # for file_path in dxf_files:
-        #     success = self._process_single_file(str(file_path))
-            
-        #     if success:
-        #         stats['processed'] += 1
-        #         stats['modified'] += 1
-        #     else:
-        #         stats['errors'].append(str(file_path))
         for file_path in dxf_files:
             processed, saved = self._process_single_file(str(file_path))
             if processed:
@@ -149,29 +141,7 @@ class IterationManager:
                 return True, False
 
         return True, False          # processed=True, saved=False
-        # should_save = False
-        # for operation in self.operation_list:
-        #     try:
-        #         result = operation.execute(doc, folder, file_name)
-        #         should_save = should_save or result
-        #         operation.message(file_name)
-        #     except Exception as e:
-        #         print(f"❌ Error processing '{file_name}': {str(e)}")
-        #         return False
-
-        # # --- SAVE ---
-        # if should_save:
-        #     try:
-        #         doc.saveas(file_path)
-        #         return True
-        #     except PermissionError:
-        #         print(f"🔒 Cannot save '{file_name}' because it is open in another application.")
-        #         return False
-        #     except Exception as e:
-        #         print(f"❌ Cannot save '{file_name}': {str(e)}")
-        #         return False
-
-        # return False
+    
     
     def _final_messages(self):
         """Prints final messages (e.g., from Counter)."""

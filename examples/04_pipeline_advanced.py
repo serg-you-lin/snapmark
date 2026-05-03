@@ -30,7 +30,7 @@ def main():
     # Add multiple operations
     manager.add_operation(
         sm.Aligner(),  # Align drawing
-        sm.AddMark(seq, scale_factor=100, align='c', max_char=20, min_char=10, down_to=5),  # Add marking
+        sm.AddMark(seq, scale_factor=100, align='c', max_height=20, min_height=10, down_to=5),  # Add marking
         sm.CountHoles(sm.find_circle_by_radius(min_diam=5, max_diam=10))  # Count holes
     )
     

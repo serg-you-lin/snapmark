@@ -2,28 +2,26 @@ import numpy as np
 from snapmark.utils.geometry import rotate_point, seg_angle, comp_centroid
 
 ##############################################################################
-# Rotazione della sequenza NS in coordinate reali
+# Rotating the TextSequence from local coordinates back to real drawing coordinates after placement.
 ##############################################################################
 
 def rotate_segment_text_sequence(sequence, pivot, angle):
     """
-    Ruota tutti i punti di una sequenza NS attorno a un pivot.
+    Rotates all points of a TextSequence around a pivot point.
 
-    Chiamato dopo place_sequence per riportare la sequenza trovata
-    in coordinate locali nelle coordinate reali del disegno.
+    Called after place_sequence to rotate the found sequence from local coordinates back to real drawing coordinates.
 
-    La rotazione avviene su due livelli:
-    - position: il punto di ancoraggio del carattere nel disegno
-    - scaled_segments: i punti dei segmenti del glifo, ruotati
-      attorno all'origine (0,0) perché sono già relativi a position
+    Rotation happens on two levels:
+    - position: anchoring point of the character in the drawing
+    - scaled_segments: segments points of the glyph, rotated around the origin (0,0) because they are already relative to position
 
     Args:
-        sequence: Oggetto NS con .sequence lista di (scaled_segments, position)
-        pivot: Tupla (x, y) attorno a cui ruotare
-        angle: Angolo in radianti
+        sequence: TextSequence object with .sequence list of (scaled_segments, position) 
+        pivot: Tuple (x, y) around which to rotate
+        angle: Angle in radians
 
     Returns:
-        La stessa sequenza NS modificata in-place (per coerenza con place_sequence)
+        The same text sequence modified in-place (for consistency with place_sequence)
     """
     for scaled_segments, position in sequence.sequence:
         # ruota il punto di ancoraggio nel disegno

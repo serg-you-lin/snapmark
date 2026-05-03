@@ -111,8 +111,8 @@ class TestAddMark(unittest.TestCase):
     def _make_op(self, **kwargs):
         defaults = dict(
             scale_factor=50,
-            min_char=5,
-            max_char=15,
+            min_height=5,
+            max_height=15,
             mark_layer='MARK',
         )
         defaults.update(kwargs)
@@ -160,7 +160,7 @@ class TestAddMark(unittest.TestCase):
         """Sequenza con solo literal funziona senza crash."""
         doc = make_rectangle()
         seq = sm.SequenceBuilder().literal("123").build()
-        op = sm.AddMark(seq, scale_factor=50, min_char=5, max_char=15)
+        op = sm.AddMark(seq, scale_factor=50, min_height=5, max_height=15)
         op.execute(doc, FOLDER, FILE)  # non deve sollevare eccezioni
 
 
@@ -172,8 +172,8 @@ class TestAddText(unittest.TestCase):
 
     def _make_op(self, **kwargs):
         defaults = dict(
-            min_char=3,
-            max_char=8,
+            min_height=3,
+            max_height=8,
             text_layer='TEXT',
             text_color=3,
         )
@@ -224,7 +224,7 @@ class TestAddText(unittest.TestCase):
         text_seq = (sm.TextBuilder()
                     .line(lambda folder, f: f"File:{f}")
                     .build())
-        op = sm.AddText(text_seq, min_char=3, max_char=8)
+        op = sm.AddText(text_seq, min_height=3, max_height=8)
         op.execute(doc, FOLDER, FILE)
         mtexts = list(doc.modelspace().query('MTEXT'))
         texts = [mt.text for mt in mtexts]
@@ -305,8 +305,8 @@ class TestFindPositionFallback(unittest.TestCase):
         op = sm.AddMark(
             seq,
             scale_factor=50,
-            min_char=3,
-            max_char=10,
+            min_height=3,
+            max_height=10,
             down_to=2,
         )
         op.execute(doc, FOLDER, FILE)
@@ -323,8 +323,8 @@ class TestFindPositionFallback(unittest.TestCase):
         op = sm.AddMark(
             seq,
             scale_factor=50,
-            min_char=5,
-            max_char=15,
+            min_height=5,
+            max_height=15,
             down_to=4,
         )
         op.execute(doc, FOLDER, FILE)

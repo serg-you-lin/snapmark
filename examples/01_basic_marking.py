@@ -18,12 +18,12 @@ def main():
     folder_2 = "input_customizable"
     
     print("=== Example 1A: Mark with filename ===")
-    sm.mark_by_name(folder_1, scale_factor=50, min_char=10, max_char=20, 
+    sm.mark_by_name(folder_1, scale_factor=50, min_height=10, max_height=20, 
                     start_y=2, margin=.5, step=2, space=1.5, down_to=3, 
                     mark_color=4, trim_start=0, mark_layer="ENGRAVE", avoid_layers=["Bend, MBend"])
     
     # For files like "PART_123_Q5.dxf", this marks only "PART"
-    sm.mark_by_splitted_text(folder_2, separator='_', part_index=0, scale_factor=50, mark_layer="ENGRAVE")
+    sm.mark_by_split_text(folder_2, separator='_', part_index=0, scale_factor=50, mark_layer="ENGRAVE")
     
     print("\n✅ Basic marking completed!")
 

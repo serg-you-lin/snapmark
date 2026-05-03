@@ -16,8 +16,8 @@ Marks DXF files using the full filename (without extension) as the marking text.
 - `trim_start` (int): Number of characters to trim from the start of the filename. Default: 0
 - `trim_end` (int): Number of characters to trim from the end of the filename. Default: 0
 - `align` (str): Text alignment - 'l' (left), 'c' (center), 'r' (right). Default: 'c'
-- `min_char` (int): Minimum character height. Default: 5
-- `max_char` (int): Maximum character height. Default: 20
+- `min_height` (int): Minimum character height. Default: 5
+- `max_height` (int): Maximum character height. Default: 20
 - `start_y` (float): Starting Y coordinate for search. Default: 1
 - `**kwargs`: Additional parameters accepted by `AddMark` (see `parameters.md`)
   - Common: `scale_factor`, `space`, `mark_layer`, `mark_color`, `excluded_layers`, `arbitrary_x`, `arbitrary_y`
@@ -30,7 +30,7 @@ import snapmark as sm
 sm.mark_by_name("part.dxf")
 
 # Folder with custom alignment and size
-sm.mark_by_name("drawings/", align='l', min_char=8, max_char=15)
+sm.mark_by_name("drawings/", align='l', min_height=8, max_height=15)
 
 # Trim suffix
 # "10000123.dxf" → "123"
@@ -44,7 +44,7 @@ sm.mark_by_name("drawings/", scale_factor=150, mark_layer='LABEL')
 
 ---
 
-## `mark_by_splitted_text(file_or_folder, separator='_', part_index=0, trim_start=0, trim_end=0, **kwargs)`
+## `mark_by_split_text(file_or_folder, separator='_', part_index=0, trim_start=0, trim_end=0, **kwargs)`
 
 Marks using a specific portion of the filename, split by a separator character.
 
@@ -57,8 +57,8 @@ Useful when filenames contain structured information (e.g., `PART_123_5mm.dxf`).
 - `trim_start` (int): Number of characters to trim from the start of the extracted part. Default: 0
 - `trim_end` (int): Number of characters to trim from the end of the extracted part. Default: 0
 - `align` (str): Text alignment. Default: 'c'
-- `min_char` (int): Minimum character height. Default: 5
-- `max_char` (int): Maximum character height. Default: 20
+- `min_height` (int): Minimum character height. Default: 5
+- `max_height` (int): Maximum character height. Default: 20
 - `start_y` (float): Starting Y coordinate. Default: 1
 - `**kwargs`: Additional `AddMark` parameters (see `parameters.md`)
 
@@ -67,25 +67,25 @@ Useful when filenames contain structured information (e.g., `PART_123_5mm.dxf`).
 import snapmark as sm
 
 # File: "S532_P5_SP4_Q2.dxf" → marks "S532"
-sm.mark_by_splitted_text("drawings/", separator='_', part_index=0)
+sm.mark_by_split_text("drawings/", separator='_', part_index=0)
 
 # File: "PROD-A123-REV2.dxf" → marks "A123"
-sm.mark_by_splitted_text("drawings/", separator='-', part_index=1)
+sm.mark_by_split_text("drawings/", separator='-', part_index=1)
 
 # Trim prefix from extracted part
 # "ID_S532.dxf" → "532"
-sm.mark_by_splitted_text("drawings/", part_index=1, trim_start=1)
+sm.mark_by_split_text("drawings/", part_index=1, trim_start=1)
 
 # Trim suffix
 # "S532REV.dxf" → "S532"
-sm.mark_by_splitted_text("drawings/", separator='_', part_index=0, trim_end=3)
+sm.mark_by_split_text("drawings/", separator='_', part_index=0, trim_end=3)
 
 # With custom parameters
-sm.mark_by_splitted_text("drawings/", 
+sm.mark_by_split_text("drawings/", 
                          separator='_', 
                          part_index=0,
                          align='r',
-                         min_char=10,
+                         min_height=10,
                          scale_factor=120)
 ```
 
@@ -101,8 +101,8 @@ Marks files using a custom sequence built with `SequenceBuilder`.
 - `file_or_folder` (str): Path to file or folder
 - `sequence` (Sequence): Sequence object created with `SequenceBuilder`
 - `align` (str): Text alignment. Default: 'c'
-- `min_char` (int): Minimum character height. Default: 5
-- `max_char` (int): Maximum character height. Default: 10
+- `min_height` (int): Minimum character height. Default: 5
+- `max_height` (int): Maximum character height. Default: 20
 - `start_y` (float): Starting Y coordinate. Default: 1
 - `**kwargs`: Additional `AddMark` parameters (see `parameters.md`)
 

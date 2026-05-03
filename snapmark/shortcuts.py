@@ -1,36 +1,36 @@
 """Funzioni di convenienza per uso rapido."""
 import os
-from .sequence.sequence_system import from_file_name, from_splitted_text
+from .sequence.sequence_system import from_file_name, from_split_text
 from .operations.basic_operations import Operation
 from .operations.placement import AddMark
 from .utils.helpers import find_circle_by_radius
 from .operations.counter import CountHoles, Counter 
+from .utils.backup_manager import BackupManager
 
 
-def mark_by_name(file_or_folder, align='c', min_char=5, max_char=20, start_y=1, **kwargs):
+def mark_by_name(file_or_folder, align='c', min_height=5, max_height=20, start_y=1, **kwargs):
     """
     Marks file/folder using the full name of the file.
     
     Args:
         file_or_folder: Path to the file or folder
         align (str): The alignment of the sequence ('l' for left, 'c' for center, 'r' for right; default is 'c').
-        min_char (float): The minimum height for characters (default is 5).
-        max_char (float): The maximum height for characters (default is 20).
+        min_height (float): The minimum height for characters (default is 5).
+        max_height (float): The maximum height for characters (default is 20).
         start_y (float): The starting y-coordinate for the search (default is 1).
         **kwargs: Other parameters for AddMark
     """
-    import os
     
     sequence = from_file_name(trim_start=kwargs.pop('trim_start', 0), trim_end=kwargs.pop('trim_end', 0))
-    mark_op = AddMark(sequence, align=align, min_char=min_char, max_char=max_char, start_y=start_y, **kwargs)
+    mark_op = AddMark(sequence, align=align, min_height=min_height, max_height=max_height, start_y=start_y, **kwargs)
     
     if os.path.isfile(file_or_folder):
         mark_op.execute_single(file_or_folder)
     else:
         Operation.process_folder(file_or_folder, mark_op)
 
-def mark_by_splitted_text(file_or_folder, separator='_', part_index=0, 
-                      align='c', min_char=5, max_char=20, start_y=1, **kwargs):
+def mark_by_split_text(file_or_folder, separator='_', part_index=0, 
+                      align='c', min_height=5, max_height=20, start_y=1, **kwargs):
     """
     Marks using a part of the file name (split by separator).
     
@@ -41,22 +41,21 @@ def mark_by_splitted_text(file_or_folder, separator='_', part_index=0,
         separator: Separator character (default: '_')
         part_index: Which part to extract (0 = first)
         align (str): The alignment of the sequence ('l' for left, 'c' for center, 'r' for right; default is 'c').
-        min_char (float): The minimum height for characters (default is 5).
-        max_char (float): The maximum height for characters (default is 20).
+        min_height (float): The minimum height for characters (default is 5).
+        max_height (float): The maximum height for characters (default is 20).
         start_y (float): The starting y-coordinate for the search (default is 1).
         **kwargs: Other parameters for AddMark
     """
-    import os
     
-    sequence = from_splitted_text(separator, part_index)
-    mark_op = AddMark(sequence, align=align, min_char=min_char, max_char=max_char, start_y=start_y, **kwargs)
+    sequence = from_split_text(separator, part_index)
+    mark_op = AddMark(sequence, align=align, min_height=min_height, max_height=max_height, start_y=start_y, **kwargs)
     
     if os.path.isfile(file_or_folder):
         mark_op.execute_single(file_or_folder)
     else:
         Operation.process_folder(file_or_folder, mark_op)
 
-def mark_with_sequence(file_or_folder, sequence, align='c', min_char=5, max_char=10, start_y=1, **kwargs):
+def mark_with_sequence(file_or_folder, sequence, align='c', min_height=5, max_height=20, start_y=1, **kwargs):
     """
     Marks files with a custom sequence.
 
@@ -64,14 +63,14 @@ def mark_with_sequence(file_or_folder, sequence, align='c', min_char=5, max_char
         file_or_folder: File or folder path
         sequence: Custom Sequence object
         align (str): The alignment of the sequence ('l' for left, 'c' for center, 'r' for right; default is 'c').
-        min_char (float): The minimum height for characters (default is 5).
-        max_char (float): The maximum height for characters (default is 20).
+        min_height (float): The minimum height for characters (default is 5).
+        max_height (float): The maximum height for characters (default is 20).
         start_y (float): The starting y-coordinate for the search (default is 1).
     """
     
     # from .operations.basic_operations import AddMark, Operation
     
-    mark_op = AddMark(sequence, align=align, min_char=min_char, max_char=max_char, start_y=start_y, **kwargs)
+    mark_op = AddMark(sequence, align=align, min_height=min_height, max_height=max_height, start_y=start_y, **kwargs)
     
     if os.path.isfile(file_or_folder):
         mark_op.execute_single(file_or_folder)
@@ -97,7 +96,7 @@ def quick_count_holes(file_or_folder, min_diam=0, max_diam=float('inf'),
     """
     
     find_func = find_circle_by_radius(min_diam, max_diam)
-    counter = CountHoles(find_func, mess=verbose)
+    counter = CountHoles(find_func, verbose=verbose)
     
     # Add multiplier if provided
     if multiplier:
@@ -122,11 +121,9 @@ def single_file_pipeline(file_path, *operations, use_backup=True):
     Returns:
         dict with statistics
     """
-    
+
     import ezdxf
-    import os
-    from .utils.backup_manager import BackupManager
-    
+
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"File not found: {file_path}")
     

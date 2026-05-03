@@ -88,8 +88,8 @@ class Operation(ABC):
             try:
                 modified = self.execute(doc, folder, file_name)
             except Exception as e:
-                import traceback
-                traceback.print_exc()
+                # import traceback
+                # traceback.print_exc()
                 print(processing_error(file_name, str(e)))
                 return False
             
@@ -111,7 +111,7 @@ class Operation(ABC):
             
         except Exception as e:
             # Catch-all for any unexpected error
-            traceback.print_exc()
+            # traceback.print_exc()
             print(processing_error(file_name, str(e)))
             return False
         

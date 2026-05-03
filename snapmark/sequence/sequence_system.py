@@ -330,7 +330,7 @@ def from_file_name(trim_start: int = 0, trim_end: int = 0) -> ComposedSequence:
     return SequenceBuilder().file_name(trim_start=trim_start, trim_end=trim_end).build()
 
 
-def from_splitted_text(separator: str = '_', part_index: int = 0, trim_start: int = 0, trim_end: int = 0) -> ComposedSequence:
+def from_split_text(separator: str = '_', part_index: int = 0, trim_start: int = 0, trim_end: int = 0) -> ComposedSequence:
     """Shortcut: first part of the filename based on a separator."""
     return SequenceBuilder().file_part(separator, part_index, trim_start, trim_end).build()
 

@@ -41,7 +41,7 @@ seq = sm.SequenceBuilder().file_name().build()
 
 ---
 
-#### `.splitted_text(separator: str, part_index: int)`
+#### `.split_text(separator: str, part_index: int)`
 Splits the filename using `separator` and extracts the part at the specified index.
 
 **Parameters:**
@@ -50,7 +50,7 @@ Splits the filename using `separator` and extracts the part at the specified ind
 
 ```python
 seq = (sm.SequenceBuilder()
-       .splitted_text(separator='_', part_index=0)
+       .split_text(separator='_', part_index=0)
        .build())
 # File: "S532_P5_Q2.dxf" → Output: "S532"
 ```
@@ -286,13 +286,13 @@ SnapMark also provides factory functions for common sequences:
 from snapmark.sequence.sequence_system import from_file_name, from_splitted_text
 
 # Equivalent to SequenceBuilder().file_name().build()
-seq1 = from_file_name()
+seq1 = from_file_name(trim_start=0, trim_end=0)
 
 # Equivalent to SequenceBuilder().file_part(sep, idx).build()
-seq2 = from_splitted_text(separator='_', part_index=0)
+seq2 = from_split_text(separator='_', part_index=0, trim_start=0, trim_end=0)
 ```
 
-These are used internally by `mark_by_name()` and `mark_by_splitted_text()` shortcuts.
+These are used internally by `mark_by_name()` and `mark_by_split_text()` shortcuts.
 
 ---
 

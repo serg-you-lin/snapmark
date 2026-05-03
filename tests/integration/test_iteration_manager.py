@@ -155,7 +155,7 @@ class TestIterationManagerSave(unittest.TestCase):
             write_rectangle_dxf(filepath)
 
             seq = sm.SequenceBuilder().literal("TEST").build()
-            mark_op = sm.AddMark(seq, scale_factor=50, min_char=5, max_char=15)
+            mark_op = sm.AddMark(seq, scale_factor=50, min_height=5, max_height=15)
 
             manager = IterationManager(tmpdir, use_backup_system=False)
             manager.add_operation(mark_op)
@@ -202,7 +202,7 @@ class TestIterationManagerPipeline(unittest.TestCase):
             write_rectangle_dxf(filepath)
 
             seq = sm.SequenceBuilder().literal("TEST").build()
-            mark_op = sm.AddMark(seq, scale_factor=50, min_char=5, max_char=15)
+            mark_op = sm.AddMark(seq, scale_factor=50, min_height=5, max_height=15)
 
             text_op = sm.AddText(
                 sm.TextBuilder().static("Mat:S235").static("Sp:5").build(),
@@ -232,7 +232,7 @@ class TestIterationManagerPipeline(unittest.TestCase):
                 write_rectangle_dxf(os.path.join(tmpdir, name))
 
             seq = sm.SequenceBuilder().literal("X").build()
-            mark_op = sm.AddMark(seq, scale_factor=50, min_char=5, max_char=15)
+            mark_op = sm.AddMark(seq, scale_factor=50, min_height=5, max_height=15)
 
             manager = IterationManager(tmpdir, use_backup_system=False)
             manager.add_operation(mark_op)

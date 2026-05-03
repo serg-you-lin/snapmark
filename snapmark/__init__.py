@@ -51,7 +51,7 @@ from .sequence.sequence_system import (
     SequenceBuilder,
     TextBuilder,
     from_file_name,
-    from_splitted_text
+    from_split_text
 )
 
 # ========== SEQUENCE (OLD - DEPRECATED) ==========
@@ -63,7 +63,7 @@ from .sequence.sequence_legacy import (
 # ========== SHORTCUTS ========== 
 from .shortcuts import (
     mark_by_name,
-    mark_by_splitted_text,
+    mark_by_split_text,
     mark_with_sequence,
     quick_count_holes,
     single_file_pipeline,  
@@ -88,12 +88,12 @@ from .utils.helpers import (
 
 
 # ========== METADATA ==========
-__version__ = "2.1.2"
+__version__ = "2.1.3"
 __author__ = "serg_you_lin"
 __all__ = [
     # Shortcuts (main API)
     'mark_by_name',
-    'mark_by_splitted_text',
+    'mark_by_split_text',
     'mark_with_sequence',
     'quick_count_holes',
     'single_file_pipeline',
@@ -103,7 +103,7 @@ __all__ = [
     'SequenceBuilder',
     'TextBuilder',
     'from_file_name',
-    'from_splitted_text',
+    'from_split_text',
 
     # Operations
     'Operation',
@@ -130,8 +130,6 @@ __all__ = [
     'mult_campana',
     'find_all_circles',
     'find_circle_by_radius',
-    
-    # Checking
     'find_spec_holes',
     'find_circle_centers',
     'find_longer_entity',
