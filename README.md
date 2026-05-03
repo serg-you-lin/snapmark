@@ -6,7 +6,7 @@ Markings are rendered as **vector segments** (polylines), not DXF text entities 
 Built on top of the excellent [`ezdxf`](https://ezdxf.mozman.at/), it provides a simple API for marking, alignment, hole analysis, and batch processing — tailored for manufacturing, CNC workflows, and automated drawing preparation.
 
 [![PyPI version](https://badge.fury.io/py/snapmark.svg)](https://badge.fury.io/py/snapmark)
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ---
