@@ -78,9 +78,12 @@ sm.mark_with_sequence("path/to/drawings", seq, scale_factor=100)
 - `process_single_file(file, *operations)` - Pipeline on single file
 
 
-### SequenceBuilder (core)
+### Mark with a custom sequence
 
 ```python
+import snapmark as sm
+
+# Build custom sequence
 seq = (sm.SequenceBuilder()
        .file_name()
        .file_part(separator="_", index=0)
@@ -89,6 +92,35 @@ seq = (sm.SequenceBuilder()
        .custom(lambda folder, file: "X")
        .set_separator("-")
        .build())
+
+# Apply sequence to all DXF files
+sm.mark_with_sequence(
+    folder=r"C:\DXF",
+    sequence=seq,
+    scale_factor=100,
+)       
+```
+
+
+### Run operations on a single file
+
+```python
+import snapmark as sm
+
+seq = sm.SequenceBuilder().file_name().build()
+
+sm.single_file_pipeline(
+    r"C:\DXF\part.dxf",
+
+    sm.Aligner(),
+
+    sm.AddMark(
+        sequence=seq,
+        scale_factor=100,
+    ),
+
+    use_backup=True
+)
 ```
 
 ### Operations (Advanced)
@@ -100,6 +132,34 @@ seq = (sm.SequenceBuilder()
 - `AddX(find_func, x_size)` - Add X marks
 - `RemoveCircle(find_func)` - Remove circles
 - `SubstituteCircle(find_func, new_radius)` - Replace circles
+
+### Build a custom batch pipeline
+
+```python
+import snapmark as sm
+
+manager = sm.IterationManager(r"C:\DXF")
+
+    sm.TrimBendLines(
+        layers="Bend",
+        start_length=10,
+        end_length=10,
+        center_length=5,
+    ),
+
+manager.add_operation(
+    sm.Aligner(),
+    sm.AddMark(
+        sequence=(
+            sm.SequenceBuilder()
+            .file_name(avoid_layers=["Bend"])
+            .build()
+        )
+    ),
+)
+
+manager.execute()
+```
 
 
 📘 Documentation:

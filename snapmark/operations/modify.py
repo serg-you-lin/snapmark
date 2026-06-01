@@ -1,6 +1,6 @@
 from snapmark.operations.basic_operations import Operation
 from snapmark.utils.helpers import find_circle_centers
-from snapmark.entities.editor import add_circle, delete_circle, add_x, delete_layer                          
+from snapmark.entities.editor import add_circle, delete_circle, add_x, delete_layer                      
 
 class SubstituteCircle(Operation):
     """Replaces existing circles with new circles of a different radius."""
@@ -93,3 +93,14 @@ class RemoveLayer(Operation):
     def message(self, file_name):
         self.message_text = f"✓ Layer '{self.layer}' removed from {file_name}"
         print(self.message_text)
+
+
+
+
+
+
+
+
+
+
+

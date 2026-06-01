@@ -319,3 +319,28 @@ def lwpolyline_to_segs(entity, min_arc_segs=15):
                 segs.append((p1[0], p1[1], p2[0], p2[1]))
     
     return segs
+
+###############################################################################
+# Bending lines trimming
+###############################################################################
+
+def _unit_vector(start, end):
+    """Restituisce il vettore unitario da start a end."""
+    dx = end[0] - start[0]
+    dy = end[1] - start[1]
+    length = math.hypot(dx, dy)
+    if length == 0:
+        raise ValueError("La bending line ha lunghezza zero.")
+    return dx / length, dy / length
+
+
+def _point_along(origin, unit_vec, distance):
+    """Restituisce il punto a `distance` unità da `origin` lungo `unit_vec`."""
+    return (
+        origin[0] + unit_vec[0] * distance,
+        origin[1] + unit_vec[1] * distance,
+    )
+
+
+def _line_length(start, end):
+    return math.hypot(end[0] - start[0], end[1] - start[1])

@@ -46,6 +46,8 @@ from .operations.modify import (
 
 from .operations.aligner import Aligner
 
+from .operations.bending import TrimBendLines   
+
 # ========== SEQUENCE (NEW SYSTEM) ==========
 from .sequence.sequence_system import (
     SequenceBuilder,
@@ -88,7 +90,7 @@ from .utils.helpers import (
 
 
 # ========== METADATA ==========
-__version__ = "2.1.4"
+__version__ = "2.2.0"
 __author__ = "serg_you_lin"
 __all__ = [
     # Shortcuts (main API)
@@ -119,7 +121,7 @@ __all__ = [
     'CountFiles',
     'CountHoles',
     'Aligner',
-    
+    'TrimBendLines',
     # Manager
     'IterationManager',
     'iteration_manager',  # Alias legacy

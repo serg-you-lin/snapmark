@@ -24,6 +24,13 @@ def add_circle_with_handle(doc, center_x, center_y, radius=10, layer='0', handle
     
     return circle
 
+def add_line(msp, p1, p2, layer, color):
+    """Aggiunge una LINE all'msp con layer e colore dell'originale."""
+    attribs = {"layer": layer}
+    if color is not None:
+        attribs["color"] = color
+    msp.add_line(p1, p2, dxfattribs=attribs)
+
 
 def add_x(doc, hole_list, x_size=8, x_layer='0', x_color=None):
     """Adds an 'X' shape at specified positions in the document."""
