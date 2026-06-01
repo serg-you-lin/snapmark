@@ -149,7 +149,7 @@ manager.add_operation(
             .build()
         )
     ),
-        sm.TrimBendLines(
+    sm.TrimBendLines(
         layers="Bend",
         start_length=10,
         end_length=10,
