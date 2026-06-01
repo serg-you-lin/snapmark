@@ -140,21 +140,20 @@ import snapmark as sm
 
 manager = sm.IterationManager(r"C:\DXF")
 
-    sm.TrimBendLines(
-        layers="Bend",
-        start_length=10,
-        end_length=10,
-        center_length=5,
-    ),
-
 manager.add_operation(
     sm.Aligner(),
     sm.AddMark(
         sequence=(
             sm.SequenceBuilder()
-            .file_name(avoid_layers=["Bend"])
+            .file_name()
             .build()
         )
+    ),
+        sm.TrimBendLines(
+        layers="Bend",
+        start_length=10,
+        end_length=10,
+        center_length=5,
     ),
 )
 
