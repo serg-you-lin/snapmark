@@ -38,7 +38,7 @@ pip install snapmark
 import snapmark as sm
 
 # Mark all DXF files with their filename
-sm.mark_by_name("path/to/drawings")
+sm.mark_by_name(r"path/to/drawings")
 
 # Custom sequence: filename + folder name
 seq = (sm.SequenceBuilder()
@@ -46,7 +46,7 @@ seq = (sm.SequenceBuilder()
        .folder(num_chars=2)   # firts 2 chars of folder name
        .build())
 
-sm.mark_with_sequence("path/to/drawings", seq, scale_factor=100)
+sm.mark_with_sequence(r"path/to/drawings", seq, scale_factor=100)
 ```
 
 ## Features
