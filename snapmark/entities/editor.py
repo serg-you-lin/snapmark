@@ -51,7 +51,7 @@ def add_x(doc, hole_list, x_size=8, x_layer='0', x_color=None):
 
 
 
-def add_numbers_to_layer(doc, sequence, number_layer = '0', number_color=None):
+def add_sequence(doc, sequence, number_layer = '0', number_color=None):
     """Adds a sequence of lines to a specified layer in the document."""
     msp = doc.modelspace()
    

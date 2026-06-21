@@ -80,10 +80,12 @@ sm.mark_with_sequence(r"path/to/drawings", seq, scale_factor=100)
 
 ### Mark with a custom sequence
 
+For more advanced workflows, you can chain multiple methods together using the SequenceBuilder to create complex, dynamic text marks. This allows you to combine filenames, folder names, static text, and even custom logic into a single sequence.
+
 ```python
 import snapmark as sm
 
-# Build custom sequence
+# Build a complex, custom marking sequence
 seq = (sm.SequenceBuilder()
        .file_name()
        .file_part(separator="_", index=0)
@@ -93,7 +95,7 @@ seq = (sm.SequenceBuilder()
        .set_separator("-")
        .build())
 
-# Apply sequence to all DXF files
+# Apply this custom sequence to all DXF files in the directory
 sm.mark_with_sequence(
     folder=r"C:\DXF",
     sequence=seq,
@@ -104,21 +106,28 @@ sm.mark_with_sequence(
 
 ### Run operations on a single file
 
+If you need to process just a single DXF file instead of an entire folder, you can use the single_file_pipeline function. This allows you to apply the same sequence of operations to an individual file, with the added safety of an automatic backup.
+
 ```python
 import snapmark as sm
 
+# Create the marking sequence (e.g., using the file name)
 seq = sm.SequenceBuilder().file_name().build()
 
+# Run the pipeline on a single specific file
 sm.single_file_pipeline(
-    r"C:\DXF\part.dxf",
+    r"C:\DXF\part.dxf",    # Path to the target DXF file
 
+    # 1. Automatically align/orient the geometry
     sm.Aligner(),
 
+    # 2. Add the vector marking sequence with custom scaling
     sm.AddMark(
         sequence=seq,
         scale_factor=100,
     ),
 
+    # Safety feature: creates a backup of the original file before modifying it
     use_backup=True
 )
 ```
@@ -135,13 +144,20 @@ sm.single_file_pipeline(
 
 ### Build a custom batch pipeline
 
+You can automatically process multiple DXF files in a folder using the IterationManager. You can stack multiple operations (such as alignment, adding text marks, or trimming lines) to be executed sequentially on every file.
+
 ```python
 import snapmark as sm
 
+# Initialize the manager with the target directory containing your DXF files
 manager = sm.IterationManager(r"C:\DXF")
 
+# Define the sequence of operations to apply to each file
 manager.add_operation(
+    # 1. Automatically align/orient the DXF geometry
     sm.Aligner(),
+
+    # 2. Add a vector marking sequence (e.g., using the file name as text)
     sm.AddMark(
         sequence=(
             sm.SequenceBuilder()
@@ -149,6 +165,8 @@ manager.add_operation(
             .build()
         )
     ),
+
+    # 3. Trim specific bend lines to optimize for laser cutting or folding
     sm.TrimBendLines(
         layers="Bend",
         start_length=10,
@@ -157,9 +175,31 @@ manager.add_operation(
     ),
 )
 
+# Run the pipeline on all files in the directory
 manager.execute()
 ```
 
+### Standalone marking
+This feature allows you to generate a new DXF file containing a vector marking sequence and save it directly to a specified directory.
+
+The sequence is built using as the Sequence Builder logic itself, with the exception of file_name() and split_text() which are not supported in this context.
+
+```python
+import snapmark as sm
+
+# Define the output directory for the DXF file (must exist)
+output_dir = r"C:\YourOutputDir"
+
+# Create the marking sequence
+seq = sm.SequenceBuilder().folder().literal("REV1").build()
+
+# Generate and save the standalone mark
+sm.StandaloneMark(
+    sequence=seq,
+    char_height=10,
+).save(output_dir)
+
+```
 
 📘 Documentation:
 (Documentation files will be available in the docs/ directory.)

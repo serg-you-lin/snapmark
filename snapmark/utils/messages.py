@@ -50,12 +50,26 @@ def no_dxf_found_error(folder_path: str) -> str:
     """Message when no DXF files found in folder."""
     return f"❓ No DXF files found in '{folder_path}'."
 
+def empty_sequence_error() -> str:
+    """Message when the sequence resolves to an empty string (e.g. all chars unmapped)."""
+    return "❓ Sequence is empty. Check the builders used (.literal, .custom, .folder)."
+
 def dxf_3d_geometry_error(file_name: str) -> str:
     """Message when 3D geometry is detected in the DXF file."""
     return (
         f"❌ 3D GEOMETRY DETECTED in '{file_name}'!\n\n"
         "SnapMark only supports 2D drawings for laser marking.\n"
         "Please flatten your DXF to 2D before processing and ensure all Z coordinates are zero.\n\n"
+    )
+
+def standalone_mark_missing_source_error() -> str:
+    """Message when a StandaloneMark sequence uses .file_name()/.split_text(),
+    which require a source file that doesn't exist in this context."""
+    return (
+        "❌ StandaloneMark sequence cannot use .file_name() or "
+        ".split_text(): no source file exists from which to read the name, "
+        "as the sequence itself generates the output file name. "
+        "Use only .folder(), .literal() or .custom()."
     )
 
 # Success messages
@@ -76,6 +90,11 @@ def operation_completed(file_name: str, operation: str = None) -> str:
     return f"✓ Operation complete on {file_name}"
 
 
+def standalone_mark_created(sequence_text: str, output_path: str) -> str:
+    """Message when a StandaloneMark DXF is successfully created."""
+    return f"✓ Sequence '{sequence_text}' created: {output_path}"
+
+
 # Utility function to print with emoji
 def print_error(message: str):
     """Prints an error message."""
@@ -90,3 +109,5 @@ def print_success(message: str):
 def print_warning(message: str):
     """Prints a warning message."""
     print(message)
+
+

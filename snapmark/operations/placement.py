@@ -7,7 +7,7 @@ from snapmark.mark_algorithm import (place_sequence,
                                     comp_segs_and_limits
                                 )
 
-from snapmark.entities.editor import add_numbers_to_layer
+from snapmark.entities.editor import add_sequence
 
 class AddMark(Operation):
     """Adding numeric marking to DXF files."""
@@ -65,7 +65,7 @@ class AddMark(Operation):
             return self.create_new
 
         self.sequence_position = seq
-        add_numbers_to_layer(doc, self.sequence_position, self.mark_layer, self.mark_color)
+        add_sequence(doc, self.sequence_position, self.mark_layer, self.mark_color)
 
         return self.create_new
                      

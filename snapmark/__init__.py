@@ -76,6 +76,9 @@ from .shortcuts import (
 # ========== ITERATION MANAGER ==========
 from .core import IterationManager, iteration_manager  # iteration_manager = alias legacy
 
+# ========== STANDALONE MARKING ==========
+from .builders.standalone_marking import StandaloneMark
+
 # ========== UTILITIES ==========
 from .utils.backup_manager import BackupManager
 from .utils.helpers import (
